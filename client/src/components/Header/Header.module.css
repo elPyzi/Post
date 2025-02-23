@@ -1,0 +1,9 @@
+.header {
+  .header__nav {
+    .header__links {
+      & active {
+        color: aqua;
+      }
+    }
+  }
+}

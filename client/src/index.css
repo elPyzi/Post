@@ -1,0 +1,4 @@
+/* globals styles - reset styles */
+@import './assets/styles/global.css';
+/* colors values */
+@import './assets/styles/colors.css';
