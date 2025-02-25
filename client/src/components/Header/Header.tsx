@@ -1,18 +1,24 @@
 import styles from './Header.module.css';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Logo } from '../Logo/Logo';
+
+import AccountSvg from '@/assets/images/account.svg';
+import SearchSvg from '../../assets/images/search.svg';
 
 export const Header = () => {
   return (
     <header className={styles.header}>
-      <Logo />
-      <nav className={styles.header__nav}>
-        <NavLink to="/">Homepage</NavLink>
-        <NavLink className={``} to="account">
-          Account
-        </NavLink>
-        <NavLink to="shopping-cart">Shopping cart</NavLink>
-      </nav>
+      <div className="container">
+        <div className={styles.header__items}>
+          <SearchSvg />
+          <Link to="/">
+            <Logo />
+          </Link>
+          <Link to="account">
+            <AccountSvg />
+          </Link>
+        </div>
+      </div>
     </header>
   );
 };

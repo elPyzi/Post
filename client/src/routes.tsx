@@ -9,6 +9,7 @@ export const routes: RouteObject[] = [
   {
     path: '/',
     element: <Layout />,
+    errorElement: <NotFound />,
     children: [
       {
         index: true,

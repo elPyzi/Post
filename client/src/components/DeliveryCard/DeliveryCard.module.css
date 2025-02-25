@@ -1,0 +1,19 @@
+.deliveryCard {
+  text-align: start;
+  font-family: var(--family-lora);
+  cursor: pointer;
+
+  .img {
+    height: 375px;
+    margin-bottom: 25px;
+  }
+  .deliveryName {
+    margin-bottom: 8px;
+    font-family: inherit;
+    font-size: 18px;
+  }
+  .price {
+    font-family: inherit;
+    font-size: 18px;
+  }
+}

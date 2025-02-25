@@ -1,0 +1,15 @@
+.delivery {
+  padding: 80px 0;
+  .title {
+    text-align: start;
+    font-family: var(--family-montserrat);
+    font-size: 32px;
+    font-weight: 400;
+  }
+  .deliveryTypes {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    overflow-x: scroll;
+  }
+}

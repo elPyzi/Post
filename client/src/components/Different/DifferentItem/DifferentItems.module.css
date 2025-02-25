@@ -1,0 +1,10 @@
+.item__title {
+  margin: 15px 0 8px 0;
+  font-family: var(--family-montserrat);
+  font-size: 20px;
+  font-weight: 400;
+}
+
+.item__label {
+  line-height: 1.2;
+}

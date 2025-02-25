@@ -1,9 +1,11 @@
 .header {
-  .header__nav {
-    .header__links {
-      & active {
-        color: aqua;
-      }
-    }
+  padding: 20px 0;
+
+  .header__items {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px 20px 10px;
+    margin-bottom: 40px;
+    border-bottom: 1px solid var(--not-accident-color);
   }
 }

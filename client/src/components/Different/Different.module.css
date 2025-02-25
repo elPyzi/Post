@@ -1,0 +1,17 @@
+.different {
+  padding: 60px 0 85px 0;
+  margin-bottom: 100px;
+
+  .diff__title {
+    text-align: center;
+    font-weight: 400;
+    font-family: var(--family-montserrat);
+    margin-bottom: 50px;
+    font-size: 28px;
+  }
+
+  .items {
+    display: flex;
+    justify-content: space-between;
+  }
+}
