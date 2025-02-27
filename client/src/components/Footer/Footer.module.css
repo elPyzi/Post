@@ -1,0 +1,38 @@
+.footer {
+  background-color: var(--secondary-color);
+  padding: 60px 0 25px 0;
+}
+
+.content {
+  padding-bottom: 50px;
+
+  .p {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    font-size: 18px;
+  }
+  .joinUs {
+    text-align: center;
+    display: flex;
+
+    .input {
+      padding: 25px 20px;
+      background-color: #385aad;
+      width: 40%;
+      color: var(--primary-color);
+    }
+
+    .signup {
+      padding: 25px 20px;
+      background-color: var(--primary-color);
+      color: var(--dark-color);
+    }
+  }
+}
+
+.copy {
+  border-top: 3px solid #1f459a;
+  color: var(--primary-color);
+  text-align: center;
+  padding-top: 10px;
+}

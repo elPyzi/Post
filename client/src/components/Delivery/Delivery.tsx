@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import styles from './Delivery.module.css';
 import { Link, Navigate } from 'react-router-dom';
 import { DeliveryCard } from '../DeliveryCard/DeliveryCard';
