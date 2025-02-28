@@ -6,6 +6,7 @@ import { RouteObject } from 'react-router-dom';
 import { NotFound } from './pages/NotFound';
 import { Login } from './components/auth/Login/Login';
 import { Reg } from './components/auth/Reg/Reg';
+import { Errorpage } from './pages/Errorpage';
 
 export const routes: RouteObject[] = [
   {
@@ -34,6 +35,10 @@ export const routes: RouteObject[] = [
   {
     path: 'reg',
     element: <Reg />,
+  },
+  {
+    path: 'Error',
+    element: <Errorpage />,
   },
   {
     path: '*',

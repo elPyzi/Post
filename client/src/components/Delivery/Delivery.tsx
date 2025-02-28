@@ -1,12 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import styles from './Delivery.module.css';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { DeliveryCard } from '../DeliveryCard/DeliveryCard';
-
-/**
- * * Егор в fetch нужно вставить url на получения типов перевозок
- * * Раскоментишь нужное, проверки позже добавлю
- */
 
 type DeliveryData = {
   id: number;
@@ -17,27 +12,36 @@ type DeliveryData = {
 }[];
 
 export const Delivery = () => {
-  // const fetchDelivery = async (): Promise<DeliveryData> => {
-  //   const response = await fetch('');
-  //   const parseData: DeliveryData = await response.json();
-  //   return parseData;
-  // };
+  const navigate = useNavigate();
 
-  // const { data, isError, isLoading, error } = useQuery<DeliveryData>({
-  //   queryKey: ['delivery'],
-  //   queryFn: fetchDelivery,
-  // });
+  const fetchDelivery = async (): Promise<DeliveryData> => {
+    const response = await fetch('/api/delivery/delivery-types');
+    const parseData: DeliveryData = await response.json();
+    return parseData;
+  };
 
-  // if (isError) return <Navigate to="" />;
+  const { data, isError, isLoading } = useQuery<DeliveryData>({
+    queryKey: ['delivery'],
+    queryFn: fetchDelivery,
+  });
+
+  if (isLoading) return <div>Загрузка</div>;
+
+  if (isError || !data || data.length === 0) {
+    navigate('/Error', { state: { errorCode: 404 } });
+    return null;
+  }
 
   return (
     <div className="container">
       <div className={styles.delivery}>
         <h3 className={styles.title}>Наши доставки</h3>
         <div className={styles.deliveryTypes}>
-          <DeliveryCard Img="afdfa" deliveryName="Oleg" price="273" />
-          {/* {data.map((deliveryType) => (
-            <Link to={deliveryType.name.replace(/\s+/g, '-')}>
+          {data.map((deliveryType) => (
+            <Link
+              to={deliveryType.name.replace(/\s+/g, '-')}
+              key={deliveryType.id}
+            >
               <DeliveryCard
                 key={deliveryType.id}
                 Img={deliveryType.img}
@@ -45,7 +49,7 @@ export const Delivery = () => {
                 price={deliveryType.price}
               />
             </Link>
-          ))} */}
+          ))}
         </div>
       </div>
     </div>

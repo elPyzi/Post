@@ -3,7 +3,7 @@ import styles from './DeliveryCard.module.css';
 type DeliveryCardProps = {
   Img: string;
   deliveryName: string;
-  price: string;
+  price: number;
 };
 
 export const DeliveryCard = ({
