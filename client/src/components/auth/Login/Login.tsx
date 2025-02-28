@@ -41,7 +41,7 @@ export const Login = () => {
 
   const { mutate } = useMutation({
     mutationFn: async ({ email, password }: LoginType): Promise<TRespone> => {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('http://localhost:4242/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -54,6 +54,7 @@ export const Login = () => {
     },
     onSuccess: (data) => {
       const { user, token } = data;
+      console.log(token);
       login(user, token);
       alert('Авторизация успешна');
       setTimeout(() => navigate('/'), 2000);

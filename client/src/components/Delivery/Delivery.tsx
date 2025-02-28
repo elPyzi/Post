@@ -20,24 +20,24 @@ export const Delivery = () => {
     return parseData;
   };
 
-  const { data, isError, isLoading } = useQuery<DeliveryData>({
-    queryKey: ['delivery'],
-    queryFn: fetchDelivery,
-  });
+  // const { data, isError, isLoading } = useQuery<DeliveryData>({
+  //   queryKey: ['delivery'],
+  //   queryFn: fetchDelivery,
+  // });
 
-  if (isLoading) return <div>Загрузка</div>;
+  // if (isLoading) return <div>Загрузка</div>;
 
-  if (isError || !data || data.length === 0) {
-    navigate('/Error', { state: { errorCode: 404 } });
-    return null;
-  }
+  // if (isError || !data || data.length === 0) {
+  //   navigate('/Error', { state: { errorCode: 404 } });
+  //   return null;
+  // }
 
   return (
     <div className="container">
       <div className={styles.delivery}>
         <h3 className={styles.title}>Наши доставки</h3>
         <div className={styles.deliveryTypes}>
-          {data.map((deliveryType) => (
+          {/* {data.map((deliveryType) => (
             <Link
               to={deliveryType.name.replace(/\s+/g, '-')}
               key={deliveryType.id}
@@ -49,7 +49,7 @@ export const Delivery = () => {
                 price={deliveryType.price}
               />
             </Link>
-          ))}
+          ))} */}
         </div>
       </div>
     </div>

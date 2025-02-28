@@ -35,7 +35,7 @@ export const Reg = () => {
       email,
       password,
     }: TReg) => {
-      const response = await fetch('/api/auth/reg', {
+      const response = await fetch('http://localhost:4242/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -45,7 +45,7 @@ export const Reg = () => {
       if (!response.ok) throw new Error(`${response.status}`);
     },
     onSuccess: () => {
-      navigate('login');
+      navigate('/login');
     },
     onError: (error) => {
       console.log(`Error code ${error}`);
