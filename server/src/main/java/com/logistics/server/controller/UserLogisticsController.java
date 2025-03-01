@@ -2,6 +2,7 @@ package com.logistics.server.controller;
 
 import com.logistics.server.dto.ReqResUsers;
 import com.logistics.server.service.UsersLogisticsService;
+import com.logistics.server.types.ResTokenUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -19,7 +20,7 @@ public class UserLogisticsController {
     }
 
     @PostMapping("/api/auth/login")
-    public ResponseEntity<ReqResUsers> login(@RequestBody ReqResUsers req){
+    public ResponseEntity<ResTokenUser> login(@RequestBody ReqResUsers req){
         return ResponseEntity.ok(userLogisticsService.login(req));
     }
 

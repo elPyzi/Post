@@ -5,6 +5,7 @@ import com.logistics.server.entity.Roles;
 import com.logistics.server.entity.Users;
 import com.logistics.server.repository.RolesRepo;
 import com.logistics.server.repository.UsersRepo;
+import com.logistics.server.types.ResTokenUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -34,13 +35,13 @@ public class UsersLogisticsService {
 
         try {
             Users user = new Users();
-            user.setUserEmail(registrationRequest.getUser().getEmail());
+            user.setUserEmail(registrationRequest.getEmail());
             Optional<Roles> result = rolesRepo.findByRoleName("CLIENT");
             user.setRole(result.get());
-            user.setUserName(registrationRequest.getUser().getName());
-            user.setUserSurname(registrationRequest.getUser().getSurname());
-            user.setUserContactNumber(registrationRequest.getUser().getTel());
-            user.setUserAddress(registrationRequest.getUser().getAddress());
+            user.setUserName(registrationRequest.getName());
+            user.setUserSurname(registrationRequest.getSurname());
+            user.setUserContactNumber(registrationRequest.getTel());
+            user.setUserAddress(registrationRequest.getAddress());
             user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
             Users usersResult = usersRepo.save(user);
             if (usersResult.getUserId()>0) {
@@ -57,46 +58,54 @@ public class UsersLogisticsService {
     }
 
 
-    public ReqResUsers login(ReqResUsers loginRequest){
-        ReqResUsers response = new ReqResUsers();
+    public ResTokenUser login(ReqResUsers loginRequest) {
+        ResTokenUser responseTokenUser = new ResTokenUser();
         try {
-            authenticationManager
-                    .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUser().getEmail(),
-                            loginRequest.getPassword()));
-            var user = usersRepo.findByUserEmail(loginRequest.getUser().getEmail()).orElseThrow();
-            System.out.println(user);
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
+            );
+            var user = usersRepo.findByUserEmail(loginRequest.getEmail()).orElseThrow();
             var jwt = jwtUtils.generateToken(user);
             var refreshToken = jwtUtils.generateRefreshToken(new HashMap<>(), user);
-            response.setStatusCode(200);
-            response.getUser().setName(user.getUsername());
-            response.getUser().setSurname(user.getUserSurname());
-            response.getUser().setEmail(user.getUserEmail());
-            response.getUser().setRole(user.getRole().getRoleName());
-            response.getToken().setAccessToken(jwt);
-            response.getToken().setRefreshToken(refreshToken);
-            response.getToken().setExpirationTime(86400);
+
+            ResTokenUser.User userData = new ResTokenUser.User();
+            userData.setName(user.getUsername());
+            userData.setSurname(user.getUserSurname());
+            userData.setEmail(user.getUserEmail());
+            userData.setTel(user.getUserContactNumber());
+            userData.setAddress(user.getUserAddress());
+            userData.setRole(user.getRole().getRoleName());
+
+            ResTokenUser.Token tokenData = new ResTokenUser.Token();
+            tokenData.setAccessToken(jwt);
+            tokenData.setRefreshToken(refreshToken);
+            tokenData.setExpiresIn(86400);
+
+            responseTokenUser.setStatusCode(200);
+            responseTokenUser.setUser(userData);
+            responseTokenUser.setToken(tokenData);
+
+            System.out.println(responseTokenUser);
         }
-        catch (Exception e){
-            response.setStatusCode(401);
+        catch (Exception e) {
+            responseTokenUser.setStatusCode(401);
+            e.printStackTrace();
         }
-        return response;
+        return responseTokenUser;
     }
-
-
-
 
 
     public ReqResUsers refreshToken(ReqResUsers refreshTokenReqiest){
         ReqResUsers response = new ReqResUsers();
         try{
-            String ourEmail = jwtUtils.extractUsername(refreshTokenReqiest.getToken().getAccessToken());
+            String ourEmail = jwtUtils.extractUsername(refreshTokenReqiest.getAccessToken());
             Users users = usersRepo.findByUserEmail(ourEmail).orElseThrow();
-            if (jwtUtils.isTokenValid(refreshTokenReqiest.getToken().getAccessToken(), users)) {
+            if (jwtUtils.isTokenValid(refreshTokenReqiest.getAccessToken(), users)) {
                 var jwt = jwtUtils.generateToken(users);
                 response.setStatusCode(200);
-                response.getToken().setAccessToken(jwt);
-                response.getToken().setRefreshToken(refreshTokenReqiest.getToken().getAccessToken());
-                response.getToken().setExpirationTime(86400);
+                response.setAccessToken(jwt);
+                response.setRefreshToken(refreshTokenReqiest.getAccessToken());
+                response.setExpirationTime(86400);
             }
             response.setStatusCode(200);
             return response;

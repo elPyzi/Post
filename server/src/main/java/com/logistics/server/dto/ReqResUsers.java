@@ -14,26 +14,16 @@ public class ReqResUsers {
 
     private int statusCode;
     private String error;
-    private User user;
+    private String name;
+    private String surname;
+    private String email;
+    private String address;
+    private String tel;
+    private String role;
+    private String accessToken;
+    private String refreshToken;
+    private int expirationTime;
     private String password;
-    private Token token;
     private Users users;
     private List<Users> usersList;
-
-    @Data
-    public static class User {
-        private String name;
-        private String surname;
-        private String email;
-        private String address;
-        private String tel;
-        private String role;
-    }
-
-    @Data
-    public static class Token {
-        private String accessToken;
-        private String refreshToken;
-        private int expirationTime;
-    }
 }
