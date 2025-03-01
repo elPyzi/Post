@@ -34,7 +34,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/**", "/public/**").permitAll()
                         .requestMatchers("/admin/**").hasAnyAuthority("ADMIN")
                         .requestMatchers("/client/**").hasAnyAuthority("CLIENT")
-                        .requestMatchers("/quest/**").hasAnyAuthority("GUEST")
                         .requestMatchers("/carrier/**").hasAnyAuthority("CARRIER")
                         .anyRequest().authenticated())
                 .sessionManagement(manager->manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

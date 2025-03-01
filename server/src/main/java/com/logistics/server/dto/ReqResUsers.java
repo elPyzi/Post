@@ -1,6 +1,5 @@
 package com.logistics.server.dto;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.logistics.server.entity.Users;
@@ -15,17 +14,26 @@ public class ReqResUsers {
 
     private int statusCode;
     private String error;
-    private String message;
-    private String token;
-    private String refreshToken;
-    private String expirationTime;
-    private String name;
-    private String surname;
-    private String address;
-    private String tel;
-    private String email;
+    private User user;
     private String password;
-    private String role;
+    private String tel;
+    private String address;
+    private Token token;
     private Users users;
     private List<Users> usersList;
+
+    @Data
+    public static class User {
+        private String name;
+        private String surname;
+        private String email;
+        private String role;
+    }
+
+    @Data
+    public static class Token {
+        private String accessToken;
+        private String refreshToken;
+        private int expirationTime;
+    }
 }
