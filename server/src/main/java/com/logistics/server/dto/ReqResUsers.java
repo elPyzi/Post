@@ -16,8 +16,6 @@ public class ReqResUsers {
     private String error;
     private User user;
     private String password;
-    private String tel;
-    private String address;
     private Token token;
     private Users users;
     private List<Users> usersList;
@@ -27,6 +25,8 @@ public class ReqResUsers {
         private String name;
         private String surname;
         private String email;
+        private String address;
+        private String tel;
         private String role;
     }
 
