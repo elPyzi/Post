@@ -55,6 +55,8 @@ export const Login = () => {
     },
     onSuccess: (data) => {
       const { user, token } = data;
+      console.log('User: ', user);
+      console.log('token: ', token);
       login(user, token);
       alert('Авторизация успешна');
       setTimeout(() => navigate('/'), 2000);

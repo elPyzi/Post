@@ -1,10 +1,8 @@
-import { Roles } from './enums/roles';
-
 export type User = {
-  userName: string | null;
-  userSurname: string | null;
-  userEmail: string | null;
-  userTel: number | null;
-  userAddress: string | null;
-  role: Roles;
+  name: string | null;
+  surname: string | null;
+  email: string | null;
+  tel: number | null;
+  address: string | null;
+  role: string | 'GUEST';
 };

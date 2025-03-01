@@ -1,6 +1,5 @@
 import { createContext, useState, ReactNode, useMemo } from 'react';
 import { User } from '../../types/User';
-import { Roles } from '../../types/enums/roles';
 import { Token } from '../../types/Token';
 
 //* Что будет доступно в контексте Авторизации
@@ -18,12 +17,12 @@ const initialState = {
   isAuth: false,
   token: null,
   user: {
-    userName: null,
-    userSurname: null,
-    userEmail: null,
-    userTel: null,
-    userAddress: null,
-    role: Roles.GUEST,
+    name: null,
+    surname: null,
+    email: null,
+    tel: null,
+    address: null,
+    role: 'GUEST',
   },
   login: () => {},
   logout: () => {},
