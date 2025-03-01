@@ -39,8 +39,8 @@ public class UsersLogisticsService {
             user.setRole(result.get());
             user.setUserName(registrationRequest.getUser().getName());
             user.setUserSurname(registrationRequest.getUser().getSurname());
-            user.setUserContactNumber(registrationRequest.getTel());
-            user.setUserAddress(registrationRequest.getAddress());
+            user.setUserContactNumber(registrationRequest.getUser().getTel());
+            user.setUserAddress(registrationRequest.getUser().getAddress());
             user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
             Users usersResult = usersRepo.save(user);
             if (usersResult.getUserId()>0) {
