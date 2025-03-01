@@ -3,7 +3,7 @@ import { Homepage } from './pages/Homepage';
 import { Account } from './pages/Account';
 import { ShoppingCart } from './pages/ShoppingCart';
 import { RouteObject } from 'react-router-dom';
-import { NotFound } from './pages/NotFound';
+import { NotFound } from './components/Errors/404/NotFound';
 import { Login } from './components/auth/Login/Login';
 import { Reg } from './components/auth/Reg/Reg';
 import { Errorpage } from './pages/Errorpage';

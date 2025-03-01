@@ -4,6 +4,7 @@ import { User } from '../../../types/User';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useAuth } from '../../../hooks/useAuth';
+import { Token } from '../../../types/Token';
 
 /**
  * * LoginType это типы которые принимает функция(типизация функции)
@@ -17,7 +18,7 @@ import { useAuth } from '../../../hooks/useAuth';
  * * в сам хук мы передаем функции, mutateFn пишем функцию запроса, onError onSuccess для обработки
  * * успешного и не успешного запроса
  *
- * ? Promise<User>
+ * ? Promise<TResponse>
  * * Асинхронные функции возвращают промис, типизируем этот промис по type User
  */
 
@@ -28,7 +29,7 @@ type LoginType = {
 
 type TRespone = {
   user: User;
-  token: string;
+  token: Token;
 };
 
 export const Login = () => {
@@ -54,7 +55,6 @@ export const Login = () => {
     },
     onSuccess: (data) => {
       const { user, token } = data;
-      console.log(token);
       login(user, token);
       alert('Авторизация успешна');
       setTimeout(() => navigate('/'), 2000);

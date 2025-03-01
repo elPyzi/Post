@@ -1,14 +1,15 @@
-import { createContext, useState, ReactNode } from 'react';
+import { createContext, useState, ReactNode, useMemo } from 'react';
 import { User } from '../../types/User';
 import { Roles } from '../../types/enums/roles';
+import { Token } from '../../types/Token';
 
 //* Что будет доступно в контексте Авторизации
 type AuthContextType = {
   isAuth: boolean;
-  token: string | null;
+  token: Token | null;
   user: User | null;
   remember_me?: boolean | undefined;
-  login: (userData: User, userToken: string) => void;
+  login: (userData: User, userToken: Token) => void;
   logout: () => void;
 };
 
@@ -18,7 +19,10 @@ const initialState = {
   token: null,
   user: {
     userName: null,
+    userSurname: null,
     userEmail: null,
+    userTel: null,
+    userAddress: null,
     role: Roles.GUEST,
   },
   login: () => {},
@@ -35,9 +39,9 @@ type AuthProviderProps = {
 //* Провайдер, обернем все приложение, что бы была доступна логика
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const [token, setToken] = useState<Token | null>(null);
 
-  const login = (userData: User, userToken: string) => {
+  const login = (userData: User, userToken: Token) => {
     setUser(userData);
     setToken(userToken);
   };
@@ -49,7 +53,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const isAuth = !!user;
 
-  const value = { user, token, login, logout, isAuth };
+  const value = useMemo(
+    () => ({
+      user,
+      token,
+      login,
+      logout,
+      isAuth,
+    }),
+    [user, token],
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
