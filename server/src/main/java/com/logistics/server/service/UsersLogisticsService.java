@@ -1,14 +1,19 @@
 package com.logistics.server.service;
 
-import com.logistics.server.dto.ReqResUsers;
+import com.logistics.server.dto.GetRequestLoginUserDto;
+import com.logistics.server.dto.GetRequestRegistrationUserDto;
+import com.logistics.server.dto.ResponceErrorServerDto;
+import com.logistics.server.dto.ResponseLoginUserDto;
 import com.logistics.server.entity.Roles;
 import com.logistics.server.entity.Users;
 import com.logistics.server.repository.RolesRepo;
 import com.logistics.server.repository.UsersRepo;
-import com.logistics.server.types.ResTokenUser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -30,45 +35,55 @@ public class UsersLogisticsService {
     private PasswordEncoder passwordEncoder;
 
 
-    public ReqResUsers register(ReqResUsers registrationRequest){
-        ReqResUsers resp = new ReqResUsers();
+    public ResponceErrorServerDto register(GetRequestRegistrationUserDto registrationRequest) {
+        ResponceErrorServerDto response = new ResponceErrorServerDto();
+        Optional<Roles> result = rolesRepo.findByRoleName("CLIENT");
+
+        Optional<Users> existingUser = usersRepo.findByUserEmail(registrationRequest.getEmail());
+        if (existingUser.isPresent()) {
+            response.setErrorCode(400);
+            return response;
+        }
+
+        Users user = new Users();
+        user.setUserEmail(registrationRequest.getEmail());
+        user.setRole(result.get());
+        user.setUserName(registrationRequest.getName());
+        user.setUserSurname(registrationRequest.getSurname());
+        user.setUserContactNumber(registrationRequest.getTel());
+        user.setUserAddress(registrationRequest.getAddress());
+        user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
 
         try {
-            Users user = new Users();
-            user.setUserEmail(registrationRequest.getEmail());
-            Optional<Roles> result = rolesRepo.findByRoleName("CLIENT");
-            user.setRole(result.get());
-            user.setUserName(registrationRequest.getName());
-            user.setUserSurname(registrationRequest.getSurname());
-            user.setUserContactNumber(registrationRequest.getTel());
-            user.setUserAddress(registrationRequest.getAddress());
-            user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
-            Users usersResult = usersRepo.save(user);
-            if (usersResult.getUserId()>0) {
-                resp.setUsers((usersResult));
-                resp.setStatusCode(200);
-            }
-
+            usersRepo.save(user);
+            response.setErrorCode(0);
+            return response;
         }
-        catch (Exception e){
-            resp.setStatusCode(500);
-            resp.setError(e.getMessage());
+        catch (DataIntegrityViolationException e) {
+            response.setErrorCode(400);
+            return response;
         }
-        return resp;
+        catch (Exception e) {
+            response.setErrorCode(500);
+            return response;
+        }
     }
 
 
-    public ResTokenUser login(ReqResUsers loginRequest) {
-        ResTokenUser responseTokenUser = new ResTokenUser();
+    public ResponceErrorServerDto login(GetRequestLoginUserDto loginRequest, ResponseLoginUserDto responseLoginUser) {
+        ResponceErrorServerDto response = new ResponceErrorServerDto();
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
             );
-            var user = usersRepo.findByUserEmail(loginRequest.getEmail()).orElseThrow();
-            var jwt = jwtUtils.generateToken(user);
-            var refreshToken = jwtUtils.generateRefreshToken(new HashMap<>(), user);
 
-            ResTokenUser.User userData = new ResTokenUser.User();
+            Users user = usersRepo.findByUserEmail(loginRequest.getEmail())
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+            String jwt = jwtUtils.generateToken(user);
+            String refreshToken = jwtUtils.generateRefreshToken(new HashMap<>(), user);
+
+            ResponseLoginUserDto.User userData = new ResponseLoginUserDto.User();
             userData.setName(user.getUsername());
             userData.setSurname(user.getUserSurname());
             userData.setEmail(user.getUserEmail());
@@ -76,26 +91,28 @@ public class UsersLogisticsService {
             userData.setAddress(user.getUserAddress());
             userData.setRole(user.getRole().getRoleName());
 
-            ResTokenUser.Token tokenData = new ResTokenUser.Token();
+            ResponseLoginUserDto.Token tokenData = new ResponseLoginUserDto.Token();
             tokenData.setAccessToken(jwt);
             tokenData.setRefreshToken(refreshToken);
             tokenData.setExpiresIn(86400);
 
-            responseTokenUser.setStatusCode(200);
-            responseTokenUser.setUser(userData);
-            responseTokenUser.setToken(tokenData);
-
-            System.out.println(responseTokenUser);
+            responseLoginUser.setUser(userData);
+            responseLoginUser.setToken(tokenData);
+            response.setErrorCode(0);
+            return response;
+        }
+        catch (AuthenticationException e) {
+            response.setErrorCode(401);
+            return response;
         }
         catch (Exception e) {
-            responseTokenUser.setStatusCode(401);
-            e.printStackTrace();
+            response.setErrorCode(500);
+            return response;
         }
-        return responseTokenUser;
     }
 
 
-    public ReqResUsers refreshToken(ReqResUsers refreshTokenReqiest){
+    /*public ReqResUsers refreshToken(ReqResUsers refreshTokenReqiest){
         ReqResUsers response = new ReqResUsers();
         try{
             String ourEmail = jwtUtils.extractUsername(refreshTokenReqiest.getAccessToken());
@@ -188,5 +205,5 @@ public class UsersLogisticsService {
             reqRes.setStatusCode(500);
         }
         return reqRes;
-    }
+    }*/
 }

@@ -1,9 +1,12 @@
 package com.logistics.server.controller;
 
-import com.logistics.server.dto.ReqResUsers;
+import com.logistics.server.dto.GetRequestLoginUserDto;
+import com.logistics.server.dto.GetRequestRegistrationUserDto;
+import com.logistics.server.dto.ResponceErrorServerDto;
+import com.logistics.server.dto.ResponseLoginUserDto;
 import com.logistics.server.service.UsersLogisticsService;
-import com.logistics.server.types.ResTokenUser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,16 +18,30 @@ public class UserLogisticsController {
     private UsersLogisticsService userLogisticsService;
 
     @PostMapping("/api/auth/register")
-    public ResponseEntity<ReqResUsers> regeister(@RequestBody ReqResUsers reg){
-        return ResponseEntity.ok(userLogisticsService.register(reg));
+    public ResponseEntity<ResponceErrorServerDto> register(@RequestBody GetRequestRegistrationUserDto reg) {
+        ResponceErrorServerDto response = userLogisticsService.register(reg);
+        if (response.getErrorCode() == 0) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.valueOf(response.getErrorCode())).body(response);
+        }
     }
 
     @PostMapping("/api/auth/login")
-    public ResponseEntity<ResTokenUser> login(@RequestBody ReqResUsers req){
-        return ResponseEntity.ok(userLogisticsService.login(req));
+    public ResponseEntity<?> login(@RequestBody GetRequestLoginUserDto req) {
+        ResponseLoginUserDto responseLoginUser = new ResponseLoginUserDto();
+        ResponceErrorServerDto errorResponse = userLogisticsService.login(req, responseLoginUser);
+
+        if (errorResponse.getErrorCode() == 0) {
+            return ResponseEntity.ok(responseLoginUser);
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.valueOf(errorResponse.getErrorCode())).body(errorResponse);
+        }
     }
 
-    @PostMapping("/api/auth/refresh")
+    /*@PostMapping("/api/auth/refresh")
     public ResponseEntity<ReqResUsers> refreshToken(@RequestBody ReqResUsers req){
         return ResponseEntity.ok(userLogisticsService.refreshToken(req));
     }
@@ -52,6 +69,6 @@ public class UserLogisticsController {
     @DeleteMapping("/admin/delete/{userId}")
     public ResponseEntity<ReqResUsers> deleteUSer(@PathVariable Integer userId){
         return ResponseEntity.ok(userLogisticsService.deleteUser(userId));
-    }
+    }*/
 
 }

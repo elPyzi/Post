@@ -1,4 +1,4 @@
-package com.logistics.server.types;
+package com.logistics.server.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -7,10 +7,9 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-public class ResTokenUser {
+public class ResponseLoginUserDto {
     private User user;
     private Token token;
-    private int statusCode;
 
     @Data
     public static class Token {
