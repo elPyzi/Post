@@ -1,0 +1,28 @@
+.save {
+  display: grid;
+  grid-template-columns: 400px 400px;
+  gap: 0 40px;
+  margin-bottom: 50px;
+
+  .inp {
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: transparent;
+    color: inherit;
+    font-size: 18px;
+    border-bottom: 2px solid var(--dark-color);
+  }
+
+  .saveBtn {
+    grid-row: 4;
+    grid-column: 1;
+
+    font-size: 18px;
+    justify-self: start;
+    color: var(--primary-color);
+    background-color: var(--dark-color);
+    padding: 7px 15px;
+    border-radius: 3px;
+  }
+}

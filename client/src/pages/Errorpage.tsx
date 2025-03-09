@@ -1,14 +1,22 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { NotFound } from '../components/Errors/404/NotFound';
 import { UserExists } from '../components/Errors/409/UserExists';
 
 export const Errorpage = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const errorCode = location.state?.errorCode;
+  const { code } = useParams();
+  const errorCode = Number(code);
+  console.log(`code ${code} errorCode ${errorCode}`);
 
-  if (errorCode === 404) return <NotFound />;
-  if (errorCode == 409) return <UserExists />;
+  if (!errorCode) return <NotFound />;
 
-  return <button onClick={() => navigate(-1)}>Назад</button>;
+  return (
+    <div>
+      {!errorCode && <div>404</div>}
+      {errorCode === 401 && <div>401</div>}
+      {errorCode === 404 && <NotFound />}
+      {errorCode === 409 && <UserExists />}
+      <button onClick={() => navigate(-1)}>Вернуться</button>
+    </div>
+  );
 };

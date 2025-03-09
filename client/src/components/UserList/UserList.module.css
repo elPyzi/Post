@@ -1,0 +1,22 @@
+.user {
+  font-family: var(--family-lora);
+
+  .info,
+  .actions {
+    width: 20%;
+    padding: 10px;
+    border-left: 1px solid var(--dark-color);
+    border-right: 1px solid var(--dark-color);
+  }
+
+  .info {
+    font-family: inherit;
+  }
+  .actions {
+    font-family: inherit;
+
+    .actionBtn {
+      font-family: inherit;
+    }
+  }
+}

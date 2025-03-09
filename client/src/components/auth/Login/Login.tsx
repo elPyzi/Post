@@ -33,8 +33,8 @@ type TRespone = {
 };
 
 export const Login = () => {
-  const [email, setEmail] = useState('');
-  const [pass, setPass] = useState('');
+  const [email, setEmail] = useState<string>('');
+  const [pass, setPass] = useState<string>('');
 
   const { login } = useAuth();
 
@@ -63,7 +63,7 @@ export const Login = () => {
     },
     onError: (error) => {
       console.log(error);
-      navigate('/Error', { state: { errorCode: error } });
+      navigate(`/error/${error.message}`);
     },
   });
 

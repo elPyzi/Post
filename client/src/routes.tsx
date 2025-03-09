@@ -1,18 +1,19 @@
 import { Layout } from './components/Layout';
 import { Homepage } from './pages/Homepage';
 import { Account } from './pages/Account';
-import { ShoppingCart } from './pages/ShoppingCart';
 import { RouteObject } from 'react-router-dom';
-import { NotFound } from './components/Errors/404/NotFound';
 import { Login } from './components/auth/Login/Login';
 import { Reg } from './components/auth/Reg/Reg';
 import { Errorpage } from './pages/Errorpage';
+import { Profile } from './components/Profile/Profile';
+import { Orders } from './components/Orders/Orders';
+import { UserInteraction } from './components/UserInteraction/UserInteraction';
 
 export const routes: RouteObject[] = [
   {
     path: '/',
     element: <Layout />,
-    errorElement: <NotFound />,
+    errorElement: <Errorpage />,
     children: [
       {
         index: true,
@@ -21,10 +22,20 @@ export const routes: RouteObject[] = [
       {
         path: 'account',
         element: <Account />,
-      },
-      {
-        path: 'shopping-cart',
-        element: <ShoppingCart />,
+        children: [
+          {
+            index: true,
+            element: <Profile />,
+          },
+          {
+            path: 'orders',
+            element: <Orders />,
+          },
+          {
+            path: 'user-interaction',
+            element: <UserInteraction />,
+          },
+        ],
       },
     ],
   },
@@ -37,11 +48,7 @@ export const routes: RouteObject[] = [
     element: <Reg />,
   },
   {
-    path: 'Error',
+    path: 'error/:code',
     element: <Errorpage />,
-  },
-  {
-    path: '*',
-    element: <NotFound />,
   },
 ];

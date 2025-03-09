@@ -1,70 +1,69 @@
-import '../../../assets/styles/auth.css';
-import { useNavigate } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
+import styles from './Profile.module.css';
 import { useState } from 'react';
+import { useAuth } from '../../hooks/useAuth';
+import { useMutation } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { User } from '../../types/User';
 
-type TReg = {
-  name: string;
-  surname: string;
-  address: string;
-  tel: string;
-  email: string;
-  password: string;
-};
+type TSave = Omit<User, 'role' | 'id'>;
 
-export const Reg = () => {
-  const [name, setName] = useState('');
-  const [surname, setSurname] = useState('');
-  const [address, setAddress] = useState('');
-  const [tel, setTel] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+export const Profile = () => {
+  const { user } = useAuth();
+
+  const [name, setName] = useState<string>(() => user?.name || '');
+  const [surname, setSurname] = useState<string>(() => user?.surname || '');
+  const [email, setEmail] = useState<string>(() => user?.email || '');
+  const [tel, setTel] = useState<string>(() => user?.tel || '');
+  const [address, setAddress] = useState<string>(() => user?.address || '');
 
   const navigate = useNavigate();
 
   const { mutate } = useMutation({
-    mutationFn: async ({
-      name,
-      surname,
-      address,
-      tel,
-      email,
-      password,
-    }: TReg) => {
-      const response = await fetch('http://localhost:4242/api/auth/register', {
-        method: 'POST',
+    mutationFn: async ({ name, surname, address, tel, email }: TSave) => {
+      const dataToSave: Partial<TSave> = {};
+      const newData = { name, surname, address, tel, email };
+
+      for (const key in newData) {
+        if (newData[key as keyof TSave] !== user?.[key as keyof TSave]) {
+          dataToSave[key as keyof TSave] = newData[key as keyof TSave];
+        }
+      }
+
+      const response = await fetch('http://localhost:4242/api/client/update', {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, surname, address, tel, email, password }),
+        body: JSON.stringify(dataToSave),
       });
       if (!response.ok) throw new Error(`${response.status}`);
     },
     onSuccess: () => {
-      navigate('/login');
+      alert('Данные успешно обновлены');
     },
     onError: (error) => {
-      if (Number(error.message) === 401) alert('Проверьте введенные данные');
-      else navigate(`error-${error.message}`);
+      navigate('/error', { state: { errorCode: error } });
     },
   });
 
-  const handleReg = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleProfileForm = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    mutate({ name, surname, address, tel, email, password });
+    mutate({ name, surname, address, tel, email });
   };
 
   return (
-    <div className="auth">
-      <form className="auth__form" onSubmit={handleReg}>
-        <h3 className="auth__title">Registration</h3>
+    <div>
+      <form
+        className={styles.save}
+        onSubmit={(event) => handleProfileForm(event)}
+      >
         <input
           type="text"
           placeholder="Введите ваше имя"
           pattern="[A-Za-zА-Яа-яЁё]{1,}"
           title="Используйте только буквы"
           required
-          className="auth__input"
+          className={styles.inp}
           value={name}
           onChange={(event) => setName(event.target.value)}
         />
@@ -74,7 +73,7 @@ export const Reg = () => {
           pattern="[A-Za-zА-Яа-яЁё]{1,}"
           title="Используйте только буквы"
           required
-          className="auth__input"
+          className={styles.inp}
           value={surname}
           onChange={(event) => setSurname(event.target.value)}
         />
@@ -84,7 +83,7 @@ export const Reg = () => {
           pattern=".*"
           title="Любое значение"
           required
-          className="auth__input"
+          className={styles.inp}
           value={address}
           onChange={(event) => setAddress(event.target.value)}
         />
@@ -97,7 +96,7 @@ export const Reg = () => {
           title="Формат: 375296333333"
           maxLength={12}
           required
-          className="auth__input"
+          className={styles.inp}
           value={tel}
           onChange={(event) => setTel(event.target.value)}
         />
@@ -108,25 +107,13 @@ export const Reg = () => {
           title="Введите корректный email"
           maxLength={30}
           required
-          className="auth__input"
+          className={styles.inp}
           value={email}
           onChange={(event) => setEmail(event.target.value)}
         />
-        <input
-          type="password"
-          placeholder="Введите ваш пароль"
-          pattern=".{6,}"
-          maxLength={30}
-          title="Пароль должен содержать минимум 6 символов"
-          required
-          className="auth__input"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-        />
-        <button type="submit" className="auth__btn">
-          Join
+        <button className={styles.saveBtn} type="submit">
+          Сохранить
         </button>
-        <button onClick={() => navigate(-1)}>Назад</button>
       </form>
     </div>
   );

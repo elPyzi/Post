@@ -2,6 +2,7 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { routes } from './routes';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './hoc/Contexts/AuthContext';
+import './App.css';
 
 const router = createBrowserRouter(routes);
 

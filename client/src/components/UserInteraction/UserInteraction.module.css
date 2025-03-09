@@ -1,0 +1,33 @@
+.userInteraction {
+  font-family: var(--family-lora);
+  .search {
+    font-family: inherit;
+    margin-bottom: 20px;
+    width: 100%;
+    border-bottom: 2px solid var(--dark-color);
+    padding: 10px 0;
+    .inp {
+      font-family: inherit;
+      padding: 10px;
+      background-color: transparent;
+      color: inherit;
+      font-size: 18px;
+      width: 35%;
+    }
+    .btn {
+      font-family: inherit;
+      font-size: 18px;
+    }
+  }
+  .usersTable {
+    width: 100%;
+    .headings {
+      .heading {
+        text-align: center;
+        font-family: var(--family-montserrat);
+        font-size: 18px;
+        width: 20%;
+      }
+    }
+  }
+}

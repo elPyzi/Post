@@ -17,6 +17,7 @@ const initialState = {
   isAuth: false,
   token: null,
   user: {
+    id: null,
     name: null,
     surname: null,
     email: null,
