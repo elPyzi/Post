@@ -18,7 +18,7 @@ export const useRefreshToken = () => {
         return false;
       }
       return true;
-    } catch {
+    } catch (error) {
       throw new Error(`Refresh провален: ${error}`);
     }
   };

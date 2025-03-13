@@ -2,11 +2,14 @@ import styles from './UserInteraction.module.css';
 import { useState, useCallback } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+
 import { User } from '../../types/User';
 import { useAuth } from '../../hooks/useAuth';
 import { UserList } from '../UserList/UserList';
 import { Pagination } from '../Pagination/Pagination';
 import { API_CONFIG } from '../../config/api.config';
+import Cookies from 'js-cookie';
+import { useRefreshToken } from '../../hooks/useRefreshToken';
 
 export type TUserInteraction = Pick<
   User,
@@ -24,13 +27,12 @@ const getTotalPageCount = (usersTotal: number): number =>
 
 export const UserInteraction = () => {
   const { user } = useAuth();
+  const { refreshToken } = useRefreshToken();
   const currentUserId = user?.id;
+  const navigate = useNavigate();
 
   const [searchUser, setSearchUser] = useState<string | undefined>(undefined);
-
   const [currentPage, setCurrentPage] = useState<number>(1);
-
-  const navigate = useNavigate();
 
   const getUsers = async (qUser?: string) => {
     const url = qUser
@@ -46,23 +48,19 @@ export const UserInteraction = () => {
   });
 
   const userInteraction = useMutation({
-    mutationFn: async ({
-      qUser,
-      action,
-    }: {
-      qUser: string;
-      action: string;
-    }) => {
+    mutationFn: async ({ qId, action }: { qId: number; action: string }) => {
       const response = await fetch(
-        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ADMIN.API_ADMIN}${action}/${qUser}`,
+        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ADMIN.API_ADMIN}${action}/${qId}`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${Cookies.get('accessToken')}`,
           },
-          body: JSON.stringify({ qUser }),
+          body: JSON.stringify({ qId }),
         },
       );
+      if (response.status === 401) refreshToken();
       if (!response.ok) throw new Error(`${response.status}`);
     },
     onSuccess: () => {
@@ -78,8 +76,8 @@ export const UserInteraction = () => {
     setSearchUser(qUser);
   };
 
-  const handleUser = (qUser: string, action: string) => {
-    userInteraction.mutate({ qUser, action });
+  const handleUser = (qId: number, action: string) => {
+    userInteraction.mutate({ qId, action });
   };
 
   const handleNextPage = useCallback(() => {

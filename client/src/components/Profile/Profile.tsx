@@ -39,11 +39,17 @@ export const Profile = () => {
     const dataToSave: Partial<TSave> = {};
     const newData = { name, surname, address, tel, email };
 
-    for (const key in newData) {
-      if (newData[key as keyof TSave] !== user?.[key as keyof TSave]) {
-        dataToSave[key as keyof TSave] = newData[key as keyof TSave];
-      }
-    }
+    // for (const key in newData) {
+    //   if (newData[key as keyof TSave] !== user?.[key as keyof TSave]) {
+    //     dataToSave[key as keyof TSave] = newData[key as keyof TSave];
+    //   }
+    // }
+
+    if (newData.name !== user?.name) dataToSave.name = newData.name;
+    if (newData.surname !== user?.surname) dataToSave.surname = newData.surname;
+    if (newData.email !== user?.email) dataToSave.email = newData.email;
+    if (newData.tel !== user?.tel) dataToSave.tel = newData.tel;
+    if (newData.address !== user?.address) dataToSave.address = newData.address;
 
     const response = await fetch(
       `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CLIENT.UPDATE}`,

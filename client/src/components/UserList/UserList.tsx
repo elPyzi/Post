@@ -3,7 +3,7 @@ import { TUserInteraction } from '../UserInteraction/UserInteraction';
 
 type TUserList = {
   user: TUserInteraction;
-  handleUser: (id: number, action: string) => void;
+  handleUser: (qId: number, action: string) => void;
 };
 
 export const UserList = ({ user, handleUser }: TUserList) => {
