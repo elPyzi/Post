@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 
+import { API_CONFIG } from '../../../config/api.config';
+
 type TReg = {
   name: string;
   surname: string;
@@ -31,13 +33,23 @@ export const Reg = () => {
       email,
       password,
     }: TReg) => {
-      const response = await fetch('http://localhost:4242/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.REGISTER}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name,
+            surname,
+            address,
+            tel,
+            email,
+            password,
+          }),
         },
-        body: JSON.stringify({ name, surname, address, tel, email, password }),
-      });
+      );
       if (!response.ok) throw new Error(`${response.status}`);
     },
     onSuccess: () => {

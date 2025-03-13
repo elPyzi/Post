@@ -6,6 +6,8 @@ import { useState } from 'react';
 import { useAuth } from '../../../hooks/useAuth';
 import { Token } from '../../../types/Token';
 
+import { API_CONFIG } from '../../../config/api.config';
+
 /**
  * * LoginType это типы которые принимает функция(типизация функции)
  * * email и pass для большего контроля мы делаем стейт для инпутов
@@ -42,22 +44,25 @@ export const Login = () => {
 
   const { mutate } = useMutation({
     mutationFn: async ({ email, password }: LoginType): Promise<TRespone> => {
-      const response = await fetch('http://localhost:4242/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.LOGIN}`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
         },
-        body: JSON.stringify({ email, password }),
-      });
+      );
       if (!response.ok) throw new Error(`${response.status}`);
 
       return await response.json();
     },
     onSuccess: (data) => {
-      const { user, token } = data;
+      const { user } = data;
       console.log('User: ', user);
-      console.log('token: ', token);
-      login(user, token);
+      login(user);
       alert('Авторизация успешна');
       setTimeout(() => navigate('/'), 2000);
     },

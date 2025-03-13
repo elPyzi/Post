@@ -6,6 +6,7 @@ import { User } from '../../types/User';
 import { useAuth } from '../../hooks/useAuth';
 import { UserList } from '../UserList/UserList';
 import { Pagination } from '../Pagination/Pagination';
+import { API_CONFIG } from '../../config/api.config';
 
 export type TUserInteraction = Pick<
   User,
@@ -25,35 +26,41 @@ export const UserInteraction = () => {
   const { user } = useAuth();
   const currentUserId = user?.id;
 
-  const [searchId, setSearchId] = useState<number | undefined>(undefined);
+  const [searchUser, setSearchUser] = useState<string | undefined>(undefined);
 
   const [currentPage, setCurrentPage] = useState<number>(1);
 
   const navigate = useNavigate();
 
-  const getUsers = async (id?: number) => {
-    const url = id
-      ? `http://localhost:4242/api/admin/getUsers/${id}`
-      : 'http://localhost:4242/api/admin/getUsers';
+  const getUsers = async (qUser?: string) => {
+    const url = qUser
+      ? `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ADMIN.GET_USERS}/${qUser}`
+      : `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ADMIN.GET_USERS}`;
     const response = await fetch(url);
     return await response.json();
   };
 
   const { data: users, refetch } = useQuery<TUserInteraction[]>({
-    queryKey: ['getUsers', searchId],
-    queryFn: () => getUsers(searchId ?? undefined),
+    queryKey: ['getUsers', searchUser],
+    queryFn: () => getUsers(searchUser ?? undefined),
   });
 
   const userInteraction = useMutation({
-    mutationFn: async ({ id, action }: { id: number; action: string }) => {
+    mutationFn: async ({
+      qUser,
+      action,
+    }: {
+      qUser: string;
+      action: string;
+    }) => {
       const response = await fetch(
-        `http://localhost:4242/api/admin/${action}/${id}`,
+        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ADMIN.API_ADMIN}${action}/${qUser}`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ id }),
+          body: JSON.stringify({ qUser }),
         },
       );
       if (!response.ok) throw new Error(`${response.status}`);
@@ -62,17 +69,17 @@ export const UserInteraction = () => {
       refetch();
     },
     onError: (error) => {
-      navigate('/error', { state: { errorCode: error } });
+      navigate(`/error/${error.message}`);
     },
   });
 
   const handleSearchUser = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const id = e.target.value ? parseInt(e.target.value, 10) : undefined;
-    setSearchId(id);
+    const qUser = e.target.value ? e.target.value : undefined;
+    setSearchUser(qUser);
   };
 
-  const handleUser = (id: number, action: string) => {
-    userInteraction.mutate({ id, action });
+  const handleUser = (qUser: string, action: string) => {
+    userInteraction.mutate({ qUser, action });
   };
 
   const handleNextPage = useCallback(() => {
@@ -95,7 +102,7 @@ export const UserInteraction = () => {
         <input
           type="text"
           className={styles.inp}
-          value={searchId}
+          value={searchUser}
           onChange={handleSearchUser}
           placeholder="Поиск"
         />

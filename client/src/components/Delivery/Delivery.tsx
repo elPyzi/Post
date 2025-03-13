@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import styles from './Delivery.module.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { DeliveryCard } from '../DeliveryCard/DeliveryCard';
+import { Carrier } from '../../types/User';
 
 type DeliveryData = {
   id: number;

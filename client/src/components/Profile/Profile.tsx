@@ -1,3 +1,7 @@
+/**
+ * * NewData это объект который содержит новый данные мы делаем сравнение с начальными значениями которые хранятся в user
+ */
+
 import styles from './Profile.module.css';
 import { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
@@ -5,10 +9,18 @@ import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { User } from '../../types/User';
 
+import { useRefreshToken } from '../../hooks/useRefreshToken';
+
+import Cookies from 'js-cookie';
+import { API_CONFIG } from '../../config/api.config';
+
 type TSave = Omit<User, 'role' | 'id'>;
+
+type TUpdateUserData = { updateData: TSave; ATTEMPTS?: number };
 
 export const Profile = () => {
   const { user } = useAuth();
+  const { refreshToken } = useRefreshToken();
 
   const [name, setName] = useState<string>(() => user?.name || '');
   const [surname, setSurname] = useState<string>(() => user?.surname || '');
@@ -18,26 +30,43 @@ export const Profile = () => {
 
   const navigate = useNavigate();
 
-  const { mutate } = useMutation({
-    mutationFn: async ({ name, surname, address, tel, email }: TSave) => {
-      const dataToSave: Partial<TSave> = {};
-      const newData = { name, surname, address, tel, email };
+  const updateUserData = async ({
+    updateData,
+    ATTEMPTS = 0,
+  }: TUpdateUserData) => {
+    if (ATTEMPTS && ATTEMPTS >= 1) return;
 
-      for (const key in newData) {
-        if (newData[key as keyof TSave] !== user?.[key as keyof TSave]) {
-          dataToSave[key as keyof TSave] = newData[key as keyof TSave];
-        }
+    const dataToSave: Partial<TSave> = {};
+    const newData = { name, surname, address, tel, email };
+
+    for (const key in newData) {
+      if (newData[key as keyof TSave] !== user?.[key as keyof TSave]) {
+        dataToSave[key as keyof TSave] = newData[key as keyof TSave];
       }
+    }
 
-      const response = await fetch('http://localhost:4242/api/client/update', {
+    const response = await fetch(
+      `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CLIENT.UPDATE}`,
+      {
         method: 'PUT',
+        credentials: 'include',
         headers: {
+          Authorization: `Bearer ${Cookies.get('accessToken')}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(dataToSave),
-      });
-      if (!response.ok) throw new Error(`${response.status}`);
-    },
+      },
+    );
+    if (response.status === 401) {
+      const isRefreshed = await refreshToken();
+      if (isRefreshed)
+        return updateUserData({ updateData: newData, ATTEMPTS: ATTEMPTS + 1 });
+    }
+    if (!response.ok) throw new Error(`${response.status}`);
+  };
+
+  const { mutate } = useMutation({
+    mutationFn: updateUserData,
     onSuccess: () => {
       alert('Данные успешно обновлены');
     },
@@ -48,7 +77,7 @@ export const Profile = () => {
 
   const handleProfileForm = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    mutate({ name, surname, address, tel, email });
+    mutate({ updateData: { name, surname, address, tel, email } });
   };
 
   return (

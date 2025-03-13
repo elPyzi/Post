@@ -6,4 +6,5 @@ export type User = {
   tel: string | null;
   address: string | null;
   role: string | 'GUEST';
+  transportType?: string;
 };
