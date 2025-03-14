@@ -3,6 +3,7 @@ import { API_CONFIG } from '../config/api.config';
 
 export const useRefreshToken = () => {
   const refreshToken = async (): Promise<boolean> => {
+    const refreshToken = Cookies.get('refreshToken');
     try {
       const response = await fetch(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.REFRESH}`,
@@ -10,7 +11,7 @@ export const useRefreshToken = () => {
           method: 'GET',
           credentials: 'include',
           headers: {
-            Authorization: `Bearer ${Cookies.get('refreshToken')}`,
+            Authorization: `Bearer ${refreshToken}`,
           },
         },
       );

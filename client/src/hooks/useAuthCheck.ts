@@ -9,13 +9,14 @@ export const useAuthCheck = () => {
   const { refreshToken } = useRefreshToken();
 
   const checkAuth = async () => {
+    const accessToken = Cookies.get('accessToken');
     const response = await fetch(
-      `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.CHECK}}`,
+      `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.CHECK}`,
       {
         method: 'GET',
         credentials: 'include',
         headers: {
-          Authorization: `Bearer ${Cookies.get('accessToken')}`,
+          Authorization: `Bearer ${accessToken}`,
           Accept: 'application/json',
         },
       },
@@ -28,7 +29,7 @@ export const useAuthCheck = () => {
       console.info('Токенов нету');
     }
     const data = await response.json();
-    login(data.user);
+    return login(data.user);
   };
 
   useQuery({
