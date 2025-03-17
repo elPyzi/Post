@@ -1,8 +1,8 @@
 package com.logistics.server.service;
 
+import com.logistics.server.entity.Users;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -18,7 +18,8 @@ import java.util.function.Function;
 public class JWTUtils {
 
     private SecretKey Key;
-    private static final long EXPIRATION_TIME = 86400000;
+    private static final long ACCESS_TIME = 300000;
+    private static final long REFRESH_TIME = 604800000;
 
     public JWTUtils() {
         String secreteString = "843567893696976453275974432697R634976R738467TR678T34865R6834R8763T478378637664538745673865783678548735687R3";
@@ -26,21 +27,21 @@ public class JWTUtils {
         this.Key = new SecretKeySpec(keyBytes, "HmacSHA256");
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(Users userDetails) {
         return Jwts.builder().
-                subject(userDetails.getUsername())
+                subject(userDetails.getUserEmail())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .expiration(new Date(System.currentTimeMillis() + ACCESS_TIME))
                 .signWith(Key)
                 .compact();
     }
 
-    public String generateRefreshToken(HashMap<String, Objects> claims, UserDetails userDetails){
+    public String generateRefreshToken(HashMap<String, Objects> claims, Users userDetails){
         return Jwts.builder()
                 .claims(claims)
-                .subject(userDetails.getUsername())
+                .subject(userDetails.getUserEmail())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .expiration(new Date(System.currentTimeMillis() + REFRESH_TIME))
                 .signWith(Key)
                 .compact();
     }
@@ -53,9 +54,9 @@ public class JWTUtils {
         return claimsTFunction.apply(Jwts.parser().verifyWith(Key).build().parseSignedClaims(token).getPayload());
     }
 
-    public  boolean isTokenValid(String token, UserDetails userDetails){
+    public  boolean isTokenValid(String token, Users userDetails){
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        return (username.equals(userDetails.getUserEmail()) && !isTokenExpired(token));
     }
 
     public  boolean isTokenExpired(String token){

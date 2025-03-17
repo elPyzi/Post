@@ -1,5 +1,6 @@
 package com.logistics.server.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
@@ -9,15 +10,6 @@ import lombok.Data;
 @Data
 public class ResponseLoginUserDto {
     private User user;
-    private Token token;
-
-    @Data
-    public static class Token {
-        private String accessToken;
-        private String refreshToken;
-        private int expiresIn;
-    }
-
     @Data
     public static class User {
         private String name;
@@ -26,5 +18,13 @@ public class ResponseLoginUserDto {
         private String tel;
         private String address;
         private String role;
+    }
+
+    @JsonIgnore
+    private Token token;
+    @Data
+    public static class Token {
+        private String accessToken;
+        private String refreshToken;
     }
 }
