@@ -150,7 +150,8 @@ public class UsersLogisticsService {
             return response;
         }
         catch (Exception e) {
-            return null;
+            response.setErrorCode(500);
+            return response;
         }
     }
 
