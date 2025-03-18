@@ -110,29 +110,33 @@ public class UsersLogisticsService {
         }
     }
 
-    public ResponseLoginUserDto checkAccessToken(String accessToken) {
+    public ResponceErrorServerDto checkAccessToken(String accessToken, ResponseLoginUserDto responseLoginUser) {
+        ResponceErrorServerDto response = new ResponceErrorServerDto();
         try {
             if (accessToken == null || accessToken.isBlank()) {
-                return null;
+                response.setErrorCode(401);
+                return response;
             }
 
             if (jwtUtils.isTokenExpired(accessToken)) {
-                return null;
+                response.setErrorCode(401);
+                return response;
             }
 
             String userEmail = jwtUtils.extractUsername(accessToken);
             if (userEmail == null) {
-                return null;
+                response.setErrorCode(401);
+                return response;
             }
 
             Users user = usersRepo.findByUserEmail(userEmail)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
             if (!jwtUtils.isTokenValid(accessToken, user)) {
-                return null;
+                response.setErrorCode(401);
+                return response;
             }
 
-            ResponseLoginUserDto response = new ResponseLoginUserDto();
             ResponseLoginUserDto.User userData = new ResponseLoginUserDto.User();
             userData.setName(user.getUsername());
             userData.setSurname(user.getUserSurname());
@@ -140,40 +144,46 @@ public class UsersLogisticsService {
             userData.setTel(user.getUserContactNumber());
             userData.setAddress(user.getUserAddress());
             userData.setRole(user.getRole().getRoleName());
-            response.setUser(userData);
 
+            responseLoginUser.setUser(userData);
+            response.setErrorCode(0);
             return response;
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             return null;
         }
     }
 
-    public ResponseLoginUserDto refreshAccessToken(String refreshToken) {
+    public ResponceErrorServerDto refreshAccessToken(String refreshToken, ResponseLoginUserDto responseLoginUser) {
+        ResponceErrorServerDto response = new ResponceErrorServerDto();
         try {
             if (refreshToken == null || refreshToken.isBlank()) {
-                return null;
+                response.setErrorCode(401);
+                return response;
             }
             if (jwtUtils.isTokenExpired(refreshToken)) {
-                return null;
+                response.setErrorCode(401);
+                return response;
             }
             String userEmail = jwtUtils.extractUsername(refreshToken);
             if (userEmail == null) {
-                return null;
+                response.setErrorCode(401);
+                return response;
             }
             Users user = usersRepo.findByUserEmail(userEmail)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
             if (!jwtUtils.isTokenValid(refreshToken, user)) {
-                return null;
+                response.setErrorCode(401);
+                return response;
             }
 
             String newAccessToken = jwtUtils.generateToken(user);
-
-            ResponseLoginUserDto response = new ResponseLoginUserDto();
             ResponseLoginUserDto.Token tokenData = new ResponseLoginUserDto.Token();
             tokenData.setAccessToken(newAccessToken);
             tokenData.setRefreshToken(refreshToken);
-            response.setToken(tokenData);
+            responseLoginUser.setToken(tokenData);
 
+            response.setErrorCode(0);
             return response;
         }
         catch (Exception e) {

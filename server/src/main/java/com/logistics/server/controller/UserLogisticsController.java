@@ -63,16 +63,14 @@ public class UserLogisticsController {
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             accessToken = authorizationHeader.substring(7);
         }
+        ResponseLoginUserDto responseLoginUser = new ResponseLoginUserDto();
+        ResponceErrorServerDto errorResponse = userLogisticsService.checkAccessToken(accessToken, responseLoginUser);
 
-        ResponseLoginUserDto response = userLogisticsService.checkAccessToken(accessToken);
-
-        if (response == null) {
-            ResponceErrorServerDto error = new ResponceErrorServerDto();
-            error.setErrorCode(401);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        if (errorResponse.getErrorCode() == 401) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         }
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(responseLoginUser);
     }
 
     @GetMapping("/api/auth/refresh")
@@ -84,25 +82,25 @@ public class UserLogisticsController {
             refreshToken = authorizationHeader.substring(7);
         }
 
-        ResponseLoginUserDto response = userLogisticsService.refreshAccessToken(refreshToken);
+        ResponseLoginUserDto responseLoginUser = new ResponseLoginUserDto();
+        ResponceErrorServerDto errorResponse = userLogisticsService.refreshAccessToken(refreshToken, responseLoginUser);
 
-        if (response == null) {
-            ResponceErrorServerDto error = new ResponceErrorServerDto();
-            error.setErrorCode(401);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+        if (errorResponse.getErrorCode() == 401) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
         }
 
-        Cookie accessTokenCookie = new Cookie("accessToken", response.getToken().getAccessToken());
+        Cookie accessTokenCookie = new Cookie("accessToken", responseLoginUser.getToken().getAccessToken());
         accessTokenCookie.setPath("/");
         accessTokenCookie.setMaxAge(60);
         httpResponse.addCookie(accessTokenCookie);
 
-        Cookie refreshTokenCookie = new Cookie("refreshToken", response.getToken().getRefreshToken());
+        Cookie refreshTokenCookie = new Cookie("refreshToken", responseLoginUser.getToken().getRefreshToken());
         refreshTokenCookie.setPath("/");
         refreshTokenCookie.setMaxAge(604800);
         httpResponse.addCookie(refreshTokenCookie);
 
-        return ResponseEntity.ok(response);
+        errorResponse.setErrorCode(0);
+        return ResponseEntity.ok(errorResponse);
     }
 
     /*
