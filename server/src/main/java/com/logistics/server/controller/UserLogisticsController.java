@@ -88,7 +88,7 @@ public class UserLogisticsController {
 
         if (response == null) {
             ResponceErrorServerDto error = new ResponceErrorServerDto();
-            error.setErrorCode(403);
+            error.setErrorCode(401);
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
         }
 
