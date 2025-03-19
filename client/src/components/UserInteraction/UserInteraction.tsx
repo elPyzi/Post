@@ -4,12 +4,12 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
 import { User } from '../../types/User';
-import { useAuth } from '../../hooks/useAuth';
 import { UserList } from '../UserList/UserList';
 import { Pagination } from '../Pagination/Pagination';
 import { API_CONFIG } from '../../config/api.config';
 import Cookies from 'js-cookie';
 import { useRefreshToken } from '../../hooks/useRefreshToken';
+import { useAppSelector } from '../../hooks/reduxHooks';
 
 export type TUserInteraction = Pick<
   User,
@@ -26,7 +26,7 @@ const getTotalPageCount = (usersTotal: number): number =>
   Math.ceil(usersTotal / ROWS_PER_PAGE);
 
 export const UserInteraction = () => {
-  const { user } = useAuth();
+  const { user } = useAppSelector((state) => state.auth);
   const { refreshToken } = useRefreshToken();
   const currentUserId = user?.id;
   const navigate = useNavigate();

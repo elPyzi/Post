@@ -1,20 +1,25 @@
 import { Navigate, NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { useAppSelector, useAppDispatch } from '../hooks/reduxHooks';
+import { logout } from '../store/slices/AuthSlice';
+import { PushMessages } from '../utils/PushMesseges';
 
 import '@/assets/styles/pages/Account.css';
 
 export const Account = () => {
-  const { isAuth, logout, user } = useAuth();
+  const pushMessages = new PushMessages();
   const navigate = useNavigate();
-  console.log(isAuth);
+  const { isAuth, user } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
+  console.log(`isAuth: ${isAuth}`);
 
-  // Если пользователь не залогинен мы делаем редирект до форм логина
+  //! Если пользователь не залогинен мы делаем редирект до форм логина
   if (!isAuth) return <Navigate to="/login" />;
 
   const handleLogout = () => {
+    pushMessages.showCheckMessage('Хорошего дня', {});
     navigate('/');
     setTimeout(() => {
-      logout();
+      dispatch(logout());
     }, 100);
   };
 

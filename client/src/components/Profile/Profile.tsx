@@ -4,10 +4,11 @@
 
 import styles from './Profile.module.css';
 import { useState } from 'react';
-import { useAuth } from '../../hooks/useAuth';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { User } from '../../types/User';
+
+import { useAppSelector } from '../../hooks/reduxHooks';
 
 import { useRefreshToken } from '../../hooks/useRefreshToken';
 
@@ -19,8 +20,9 @@ type TSave = Omit<User, 'role' | 'id'>;
 type TUpdateUserData = { updateData: TSave; ATTEMPTS?: number };
 
 export const Profile = () => {
-  const { user } = useAuth();
   const { refreshToken } = useRefreshToken();
+
+  const { user } = useAppSelector((state) => state.auth);
 
   const [name, setName] = useState<string>(() => user?.name || '');
   const [surname, setSurname] = useState<string>(() => user?.surname || '');

@@ -1,6 +1,7 @@
 import { Header } from './Header/Header';
 import { Footer } from './Footer/Footer';
 import { Outlet } from 'react-router-dom';
+import { CookieEnable } from './CookieEnable/CookieEnable';
 
 export const Layout = () => {
   return (
@@ -10,6 +11,7 @@ export const Layout = () => {
         <Outlet />
       </main>
       <Footer />
+      <CookieEnable />
     </div>
   );
 };
