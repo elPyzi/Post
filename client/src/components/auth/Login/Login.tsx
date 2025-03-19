@@ -3,10 +3,10 @@ import '../../../assets/styles/auth.css';
 import { User } from '../../../types/User';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
-import { useAuth } from '../../../hooks/useAuth';
-import { Token } from '../../../types/Token';
-
+import { useAppDispatch } from '../../../hooks/reduxHooks';
+import { login } from '../../../store/slices/AuthSlice'; // Add this import
 import { API_CONFIG } from '../../../config/api.config';
+import { PushMessages } from '../../../utils/PushMesseges';
 
 /**
  * * LoginType это типы которые принимает функция(типизация функции)
@@ -31,14 +31,13 @@ type LoginType = {
 
 type TRespone = {
   user: User;
-  token: Token;
 };
 
 export const Login = () => {
+  const pushMessages = new PushMessages();
   const [email, setEmail] = useState<string>('');
   const [pass, setPass] = useState<string>('');
-
-  const { login } = useAuth();
+  const dispatch = useAppDispatch();
 
   const navigate = useNavigate();
 
@@ -62,9 +61,11 @@ export const Login = () => {
     onSuccess: (data) => {
       const { user } = data;
       console.log('User: ', user);
-      login(user);
-      alert('Авторизация успешна');
-      setTimeout(() => navigate('/'), 2000);
+      dispatch(login(user));
+      pushMessages.showCheckMessage('Авторизация успешна', {
+        body: 'Хорошего дня',
+      });
+      setTimeout(() => navigate('/'), 1000);
     },
     onError: (error) => {
       console.log(error);

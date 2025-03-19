@@ -1,0 +1,17 @@
+.cookieEnable {
+  position: fixed;
+  bottom: 5%;
+  left: 5%;
+  background-color: #49261d;
+  padding: 20px 10px;
+  color: var(--primary-color);
+  border-radius: 5px;
+
+  .useCookieTitle {
+    color: inherit;
+    margin-bottom: 10px;
+  }
+  .cookieBTN {
+    margin-right: 20px;
+  }
+}
