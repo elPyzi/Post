@@ -9,9 +9,7 @@ export const useRefreshToken = () => {
   const dispatch = useAppDispatch();
 
   const refreshToken = async (): Promise<boolean> => {
-    console.log('refresh');
     const refreshToken = Cookies.get('refreshToken');
-    console.log(`refreshToken:${refreshToken}`);
 
     if (refreshToken) {
       const response = await fetch(
@@ -24,8 +22,7 @@ export const useRefreshToken = () => {
           },
         },
       );
-      console.log(`refresh response:`);
-      console.log(response);
+
       if (!response.ok || response.status === 403) return false;
 
       console.log('refresh true');
