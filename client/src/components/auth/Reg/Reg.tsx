@@ -1,9 +1,11 @@
 import '../../../assets/styles/auth.css';
+
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import { API_CONFIG } from '../../../config/api.config';
+import { PushMessages } from '../../../utils/PushMesseges';
 
 type TReg = {
   name: string;
@@ -15,6 +17,8 @@ type TReg = {
 };
 
 export const Reg = () => {
+  const pushMessages = new PushMessages();
+
   const [name, setName] = useState('');
   const [surname, setSurname] = useState('');
   const [address, setAddress] = useState('');
@@ -56,8 +60,13 @@ export const Reg = () => {
       navigate('/login');
     },
     onError: (error) => {
-      if (Number(error.message) === 401) alert('Проверьте введенные данные');
-      else navigate(`error-${error.message}`);
+      if (Number(error.message) === 409) {
+        pushMessages.showErrorMessage('Ошибка данных', {
+          body: 'Такой пользователь уже существует',
+        });
+        return;
+      }
+      navigate(`error-${error.message}`);
     },
   });
 

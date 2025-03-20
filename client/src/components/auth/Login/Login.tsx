@@ -1,9 +1,11 @@
-import { Link, useNavigate } from 'react-router-dom';
 import '../../../assets/styles/auth.css';
-import { User } from '../../../types/User';
+
+import { Link, useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useAppDispatch } from '../../../hooks/reduxHooks';
+
+import { User } from '../../../types/User';
 import { login } from '../../../store/slices/AuthSlice'; // Add this import
 import { API_CONFIG } from '../../../config/api.config';
 import { PushMessages } from '../../../utils/PushMesseges';
@@ -60,7 +62,6 @@ export const Login = () => {
     },
     onSuccess: (data) => {
       const { user } = data;
-      console.log('User: ', user);
       dispatch(login(user));
       pushMessages.showCheckMessage('Авторизация успешна', {
         body: 'Хорошего дня',
@@ -68,7 +69,12 @@ export const Login = () => {
       setTimeout(() => navigate('/'), 1000);
     },
     onError: (error) => {
-      console.log(error);
+      if (error.message === '403') {
+        pushMessages.showErrorMessage('Вы заблокированы', {
+          body: 'Введите себя лучше',
+        });
+        return;
+      }
       navigate(`/error/${error.message}`);
     },
   });

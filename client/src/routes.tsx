@@ -9,6 +9,8 @@ import { Profile } from './components/Profile/Profile';
 import { Orders } from './components/Orders/Orders';
 import { UserInteraction } from './components/UserInteraction/UserInteraction';
 
+import { ProtectedAuth } from './utils/ProtectedRoutes/ProtectedAuth';
+
 export const routes: RouteObject[] = [
   {
     path: '/',
@@ -21,7 +23,11 @@ export const routes: RouteObject[] = [
       },
       {
         path: 'account',
-        element: <Account />,
+        element: (
+          <ProtectedAuth>
+            <Account />
+          </ProtectedAuth>
+        ),
         children: [
           {
             index: true,
