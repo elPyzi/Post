@@ -13,7 +13,7 @@ export const ProtectedAuth = ({ children }: ProtectedAuthProps) => {
 
   const isAuth = !!user;
 
-  if (isChecking && isAuth) return <div>Loading</div>;
+  if (isChecking) return <div>Loading</div>;
 
   // ! Редирект если пользователь не аутентифицирован
   if (!isAuth) return <Navigate to="/login" replace />;

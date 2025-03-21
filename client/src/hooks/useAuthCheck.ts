@@ -10,8 +10,8 @@ import { login } from '../store/slices/AuthSlice';
 import { PushMessages } from '../utils/PushMesseges';
 
 export const useAuthCheck = () => {
-  const pushMessages = new PushMessages();
   const [isChecking, setChecking] = useState(true);
+  const pushMessages = new PushMessages();
 
   const dispatch = useAppDispatch();
   const { refreshToken } = useRefreshToken();
