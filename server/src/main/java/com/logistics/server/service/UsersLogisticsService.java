@@ -1,7 +1,7 @@
 package com.logistics.server.service;
 
-import com.logistics.server.dto.GetRequestLoginUserDto;
-import com.logistics.server.dto.GetRequestRegistrationUserDto;
+import com.logistics.server.dto.RequestLoginUserDto;
+import com.logistics.server.dto.RequestRegistrationUserDto;
 import com.logistics.server.dto.ResponceErrorServerDto;
 import com.logistics.server.dto.ResponseLoginUserDto;
 import com.logistics.server.entity.Roles;
@@ -18,7 +18,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -35,13 +34,13 @@ public class UsersLogisticsService {
     private PasswordEncoder passwordEncoder;
 
 
-    public ResponceErrorServerDto register(GetRequestRegistrationUserDto registrationRequest) {
+    public ResponceErrorServerDto register(RequestRegistrationUserDto registrationRequest) {
         ResponceErrorServerDto response = new ResponceErrorServerDto();
         Optional<Roles> result = rolesRepo.findByRoleName("CLIENT");
 
         Optional<Users> existingUser = usersRepo.findByUserEmail(registrationRequest.getEmail());
         if (existingUser.isPresent()) {
-            response.setErrorCode(400);
+            response.setErrorCode(409);
             return response;
         }
 
@@ -70,7 +69,7 @@ public class UsersLogisticsService {
     }
 
 
-    public ResponceErrorServerDto login(GetRequestLoginUserDto loginRequest, ResponseLoginUserDto responseLoginUser) {
+    public ResponceErrorServerDto login(RequestLoginUserDto loginRequest, ResponseLoginUserDto responseLoginUser) {
         ResponceErrorServerDto response = new ResponceErrorServerDto();
         try {
             authenticationManager.authenticate(

@@ -37,6 +37,9 @@ public class Users implements UserDetails {
     @Column(name = "user_password")
     private String password;
 
+    @Column(name = "isban")
+    private boolean isbn = false;
+
     @ManyToOne
     @JoinColumn(name = "fk_user_role_id", referencedColumnName = "role_id")
     private Roles role;
