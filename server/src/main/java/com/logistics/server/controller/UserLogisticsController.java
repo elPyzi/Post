@@ -1,7 +1,7 @@
 package com.logistics.server.controller;
 
-import com.logistics.server.dto.GetRequestLoginUserDto;
-import com.logistics.server.dto.GetRequestRegistrationUserDto;
+import com.logistics.server.dto.RequestLoginUserDto;
+import com.logistics.server.dto.RequestRegistrationUserDto;
 import com.logistics.server.dto.ResponceErrorServerDto;
 import com.logistics.server.dto.ResponseLoginUserDto;
 import com.logistics.server.service.UsersLogisticsService;
@@ -11,8 +11,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,7 +19,7 @@ public class UserLogisticsController {
     private UsersLogisticsService userLogisticsService;
 
     @PostMapping("/api/auth/register")
-    public ResponseEntity<ResponceErrorServerDto> register(@RequestBody GetRequestRegistrationUserDto reg) {
+    public ResponseEntity<ResponceErrorServerDto> register(@RequestBody RequestRegistrationUserDto reg) {
         ResponceErrorServerDto response = userLogisticsService.register(reg);
         if (response.getErrorCode() == 0) {
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -32,14 +30,14 @@ public class UserLogisticsController {
     }
 
     @PostMapping("/api/auth/login")
-    public ResponseEntity<?> login(@RequestBody GetRequestLoginUserDto req, HttpServletResponse httpResponse) {
+    public ResponseEntity<?> login(@RequestBody RequestLoginUserDto req, HttpServletResponse httpResponse) {
         ResponseLoginUserDto responseLoginUser = new ResponseLoginUserDto();
         ResponceErrorServerDto errorResponse = userLogisticsService.login(req, responseLoginUser);
 
         if (errorResponse.getErrorCode() == 0) {
             Cookie accessTokenCookie = new Cookie("accessToken", responseLoginUser.getToken().getAccessToken());
             accessTokenCookie.setPath("/");
-            accessTokenCookie.setMaxAge(60);
+            accessTokenCookie.setMaxAge(900);
 
             Cookie refreshTokenCookie = new Cookie("refreshToken", responseLoginUser.getToken().getRefreshToken());
             refreshTokenCookie.setPath("/");
