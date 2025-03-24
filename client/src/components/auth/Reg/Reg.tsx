@@ -21,10 +21,28 @@ export const Reg = () => {
 
   const [name, setName] = useState('');
   const [surname, setSurname] = useState('');
-  const [address, setAddress] = useState('');
+  const [address, setAddress] = useState('Минск');
   const [tel, setTel] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const cities = [
+    // РБ
+    'Минск',
+    'Брест',
+    'Витебск',
+    'Гомель',
+    'Гродно',
+    'Могилев',
+    // Ру
+    'Москва',
+    'Санкт-Петербург',
+    'Смоленск',
+    // ЕС
+    'Вильнюс',
+    'Таллин',
+    'Рига',
+  ];
 
   const navigate = useNavigate();
 
@@ -99,16 +117,18 @@ export const Reg = () => {
           value={surname}
           onChange={(event) => setSurname(event.target.value)}
         />
-        <input
-          type="text"
-          placeholder="Введите ваш адрес"
-          pattern=".*"
-          title="Любое значение"
-          required
-          className="auth__input"
+        <select
           value={address}
           onChange={(event) => setAddress(event.target.value)}
-        />
+          required
+          className="auth__input"
+        >
+          {cities.map((city) => (
+            <option key={city} value={city}>
+              {city}
+            </option>
+          ))}
+        </select>
         <input
           type="tel"
           id="phone"

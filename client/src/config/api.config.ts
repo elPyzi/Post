@@ -9,10 +9,14 @@ export const API_CONFIG = {
     },
     CLIENT: {
       UPDATE: '/api/client/update',
+      MAKE_ORDER: '/api/client/make-order',
     },
     ADMIN: {
       API_ADMIN: '/api/admin/',
       GET_USERS: 'api/admin/getUsers',
+    },
+    DELIVERY: {
+      DELIVERY_TYPES: '/api/delivery/delivery-types',
     },
   },
 };

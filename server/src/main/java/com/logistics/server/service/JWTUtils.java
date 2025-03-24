@@ -18,7 +18,7 @@ import java.util.function.Function;
 public class JWTUtils {
 
     private SecretKey Key;
-    private static final long ACCESS_TIME = 300000;
+    private static final long ACCESS_TIME = 900000;
     private static final long REFRESH_TIME = 604800000;
 
     public JWTUtils() {
