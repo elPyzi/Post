@@ -90,6 +90,7 @@ export const Reg = () => {
 
   const handleReg = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    console.log(address, typeof address);
     mutate({ name, surname, address, tel, email, password });
   };
 

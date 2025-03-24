@@ -1,5 +1,6 @@
 import styles from './Delivery.module.css';
 
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
 import { DeliveryCard } from '../DeliveryCard/DeliveryCard';
@@ -8,6 +9,7 @@ import { API_CONFIG } from '../../config/api.config';
 import { useAuthCheck } from '../../hooks/useAuthCheck';
 
 import Cookies from 'js-cookie';
+import { PushMessages } from '../../utils/PushMesseges';
 
 type DeliveryData = {
   id: number;
@@ -17,7 +19,10 @@ type DeliveryData = {
   img: string;
 }[];
 
+// ! ПРОВЕРИТЬ ЕСЛИ REFRESH И ACCESS НЕ БУДЕТ И ПОСМОТРЕТЬ ЗАПРОС
+
 export const Delivery = () => {
+  const pushMessages = useMemo(() => new PushMessages(), []);
   const navigate = useNavigate();
   const { checkAuth } = useAuthCheck();
 
@@ -26,6 +31,15 @@ export const Delivery = () => {
 
     if (!accessToken) {
       await checkAuth();
+
+      if (!Cookies.get('accessToken')) {
+        navigate('/login');
+        pushMessages.showErrorMessage('Сессия истекла', {
+          body: 'Авторизуйтесь снова',
+        });
+        throw new Error('Unauthorized');
+      }
+
       return fetchDeliveryTypes();
     }
 
@@ -42,6 +56,14 @@ export const Delivery = () => {
 
     if (response.status === 401) {
       await checkAuth();
+
+      if (!Cookies.get('accessToken')) {
+        navigate('/login');
+        pushMessages.showErrorMessage('Сессия истекла', {
+          body: 'Авторизуйтесь снова',
+        });
+        throw new Error('Unauthorized');
+      }
       return fetchDeliveryTypes();
     }
 

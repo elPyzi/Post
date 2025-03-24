@@ -76,7 +76,7 @@ export const useAuthCheck = () => {
     },
     retry: false,
     refetchOnWindowFocus: false,
-    enabled: COOKIE_ENABLE,
+    enabled: false,
   });
 
   return { checkAuth, isChecking };

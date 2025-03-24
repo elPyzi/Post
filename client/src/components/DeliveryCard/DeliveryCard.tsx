@@ -1,6 +1,6 @@
 import styles from './DeliveryCard.module.css';
 import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { API_CONFIG } from '../../config/api.config';
 import Cookies from 'js-cookie';
 import { useAuthCheck } from '../../hooks/useAuthCheck';
@@ -13,46 +13,71 @@ type DeliveryCardProps = {
   price: number;
 };
 
+type TCarrier = {
+  id: number;
+  name: string;
+}[];
+
 export const DeliveryCard = ({
   id,
   Img,
   deliveryName,
   price,
 }: DeliveryCardProps) => {
+  const getCarriers = async () => {
+    const accessToken = Cookies.get('accessToken');
+
+    if (!accessToken) {
+      await checkAuth();
+      return getCarriers();
+    }
+
+    try {
+      const response = await fetch(
+        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DELIVERY.GET_CARRIERS}/${deliveryName}`,
+        {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            Accept: 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+      if (response.status === 401) {
+        await checkAuth();
+        return getCarriers();
+      }
+      return await response.json();
+    } catch (error) {
+      throw new Error(`${error}`);
+    }
+  };
+
+  const { data: carriers } = useQuery<TCarrier>({
+    queryKey: ['carrier'],
+    queryFn: getCarriers,
+  });
+
   const [address, setAddress] = useState<string>('Минск');
+  const [carrier, setCarrier] = useState<string>('');
   const { checkAuth } = useAuthCheck();
   const navigate = useNavigate();
-
-  const cities = [
-    // РБ
-    'Минск',
-    'Брест',
-    'Витебск',
-    'Гомель',
-    'Гродно',
-    'Могилев',
-    // Ру
-    'Москва',
-    'Санкт-Петербург',
-    'Смоленск',
-    // ЕС
-    'Вильнюс',
-    'Таллин',
-    'Рига',
-  ];
 
   const makeOrder = async ({
     id,
     goingToCity,
+    carrier,
   }: {
     id: number;
     goingToCity: string;
+    carrier: string;
   }) => {
     const accessToken = Cookies.get('accessToken');
 
     if (!accessToken) {
       await checkAuth();
-      return makeOrder({ id, goingToCity: address });
+      return makeOrder({ id, goingToCity: address, carrier });
     }
     try {
       const response = await fetch(
@@ -82,8 +107,26 @@ export const DeliveryCard = ({
     },
   });
 
+  const cities = [
+    // РБ
+    'Минск',
+    'Брест',
+    'Витебск',
+    'Гомель',
+    'Гродно',
+    'Могилев',
+    // Ру
+    'Москва',
+    'Санкт-Петербург',
+    'Смоленск',
+    // ЕС
+    'Вильнюс',
+    'Таллин',
+    'Рига',
+  ];
+
   const handleDelivery = () => {
-    mutate({ id, goingToCity: address });
+    mutate({ id, goingToCity: address, carrier });
   };
 
   return (
@@ -101,6 +144,18 @@ export const DeliveryCard = ({
           {cities.map((city) => (
             <option key={city} value={city}>
               {city}
+            </option>
+          ))}
+        </select>
+        <select
+          value={carrier}
+          onChange={(event) => setCarrier(event.target.value)}
+          required
+          className="auth__input"
+        >
+          {carriers?.map((carrier) => (
+            <option key={carrier.id} value={carrier.name}>
+              {carrier.name}
             </option>
           ))}
         </select>
