@@ -1,9 +1,11 @@
 import '../../../assets/styles/auth.css';
+
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import { API_CONFIG } from '../../../config/api.config';
+import { PushMessages } from '../../../utils/PushMesseges';
 
 type TReg = {
   name: string;
@@ -15,12 +17,32 @@ type TReg = {
 };
 
 export const Reg = () => {
+  const pushMessages = new PushMessages();
+
   const [name, setName] = useState('');
   const [surname, setSurname] = useState('');
-  const [address, setAddress] = useState('');
+  const [address, setAddress] = useState('Минск');
   const [tel, setTel] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const cities = [
+    // РБ
+    'Минск',
+    'Брест',
+    'Витебск',
+    'Гомель',
+    'Гродно',
+    'Могилев',
+    // Ру
+    'Москва',
+    'Санкт-Петербург',
+    'Смоленск',
+    // ЕС
+    'Вильнюс',
+    'Таллин',
+    'Рига',
+  ];
 
   const navigate = useNavigate();
 
@@ -56,13 +78,19 @@ export const Reg = () => {
       navigate('/login');
     },
     onError: (error) => {
-      if (Number(error.message) === 401) alert('Проверьте введенные данные');
-      else navigate(`error-${error.message}`);
+      if (Number(error.message) === 409) {
+        pushMessages.showErrorMessage('Ошибка данных', {
+          body: 'Такой пользователь уже существует',
+        });
+        return;
+      }
+      navigate(`error-${error.message}`);
     },
   });
 
   const handleReg = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    console.log(address, typeof address);
     mutate({ name, surname, address, tel, email, password });
   };
 
@@ -90,16 +118,18 @@ export const Reg = () => {
           value={surname}
           onChange={(event) => setSurname(event.target.value)}
         />
-        <input
-          type="text"
-          placeholder="Введите ваш адрес"
-          pattern=".*"
-          title="Любое значение"
-          required
-          className="auth__input"
+        <select
           value={address}
           onChange={(event) => setAddress(event.target.value)}
-        />
+          required
+          className="auth__input"
+        >
+          {cities.map((city) => (
+            <option key={city} value={city}>
+              {city}
+            </option>
+          ))}
+        </select>
         <input
           type="tel"
           id="phone"

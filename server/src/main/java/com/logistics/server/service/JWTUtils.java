@@ -10,8 +10,6 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Objects;
 import java.util.function.Function;
 
 @Component
@@ -28,6 +26,7 @@ public class JWTUtils {
     }
 
     public String generateToken(Users userDetails) {
+        System.out.println(userDetails.getRole().getRoleName());
         return Jwts.builder().
                 subject(userDetails.getUserEmail())
                 .issuedAt(new Date(System.currentTimeMillis()))
@@ -36,9 +35,8 @@ public class JWTUtils {
                 .compact();
     }
 
-    public String generateRefreshToken(HashMap<String, Objects> claims, Users userDetails){
+    public String generateRefreshToken(Users userDetails){
         return Jwts.builder()
-                .claims(claims)
                 .subject(userDetails.getUserEmail())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + REFRESH_TIME))

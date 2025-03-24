@@ -1,59 +1,71 @@
-import { useQuery } from '@tanstack/react-query';
 import Cookies from 'js-cookie';
+
+import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { useRefreshToken } from './useRefreshToken';
-import { API_CONFIG } from '../config/api.config';
 import { useAppDispatch } from './reduxHooks';
+
+import { API_CONFIG } from '../config/api.config';
 import { login } from '../store/slices/AuthSlice';
+import { PushMessages } from '../utils/PushMesseges';
 
 export const useAuthCheck = () => {
+  const [isChecking, setChecking] = useState(true);
+  const pushMessages = new PushMessages();
+
   const dispatch = useAppDispatch();
   const { refreshToken } = useRefreshToken();
   const COOKIE_ENABLE =
     localStorage.getItem('cookieEnable') === 'accept' ? true : false;
 
-  // console.log(`COOKIE_ENABLE: ${COOKIE_ENABLE}`);
-
   const checkAuth = async () => {
-    console.log('зашел в check auth');
-    const accessToken = Cookies.get('accessToken');
-    console.log(`accessToken: ${accessToken}`);
+    try {
+      const accessToken = Cookies.get('accessToken');
 
-    if (accessToken) {
-      const response = await fetch(
-        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.CHECK}`,
-        {
-          method: 'GET',
-          credentials: 'include',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            Accept: 'application/json',
+      if (accessToken) {
+        const response = await fetch(
+          `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.CHECK}`,
+          {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              Accept: 'application/json',
+            },
           },
-        },
-      );
-      console.log(`access response:`);
-      console.log(response);
+        );
 
-      if (!response.ok || response.status === 403) return null;
+        if (!response.ok) {
+          setChecking(false);
+          return null;
+        }
 
-      const data = await response.json();
-      console.log(`Full data:`, data);
-      const { user } = data;
-      console.log(`user data:`, user);
+        if (response.status == 403) {
+          pushMessages.showErrorMessage('Вы заблокированы', {
+            body: 'Введите себя лучше',
+          });
+          setChecking(false);
+          return null;
+        }
 
-      dispatch(login(user));
+        const data = await response.json();
+        const { user } = data;
+        dispatch(login(user));
+        setChecking(false);
+        return null;
+      }
+
+      const isRefreshed = await refreshToken();
+
+      if (isRefreshed) return checkAuth();
+
+      console.info('Токенов нету');
       return null;
+    } catch (error) {
+      throw new Error(`${error}`);
+    } finally {
+      setChecking(false);
     }
-
-    console.log('Вызова рефреша');
-    const isRefreshed = await refreshToken();
-
-    console.log(`isRefreshed:${isRefreshed}`);
-    if (isRefreshed) {
-      console.log('рекурсивный вызов');
-      return checkAuth();
-    }
-    console.info('Токенов нету');
-    return null;
   };
 
   useQuery({
@@ -64,8 +76,8 @@ export const useAuthCheck = () => {
     },
     retry: false,
     refetchOnWindowFocus: false,
-    enabled: COOKIE_ENABLE,
+    enabled: false,
   });
 
-  return { checkAuth };
+  return { checkAuth, isChecking };
 };

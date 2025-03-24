@@ -10,14 +10,9 @@ import com.logistics.server.repository.RolesRepo;
 import com.logistics.server.repository.UsersRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
 import java.util.Optional;
 
 @Service
@@ -28,8 +23,6 @@ public class UsersLogisticsService {
     private RolesRepo rolesRepo;
     @Autowired
     private JWTUtils jwtUtils;
-    @Autowired
-    private AuthenticationManager authenticationManager;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -72,34 +65,34 @@ public class UsersLogisticsService {
     public ResponceErrorServerDto login(RequestLoginUserDto loginRequest, ResponseLoginUserDto responseLoginUser) {
         ResponceErrorServerDto response = new ResponceErrorServerDto();
         try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
-            );
-
             Users user = usersRepo.findByUserEmail(loginRequest.getEmail())
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-            String jwt = jwtUtils.generateToken(user);
-            String refreshToken = jwtUtils.generateRefreshToken(new HashMap<>(), user);
+            if (passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+                String jwt = jwtUtils.generateToken(user);
+                String refreshToken = jwtUtils.generateRefreshToken(user);
 
-            ResponseLoginUserDto.User userData = new ResponseLoginUserDto.User();
-            userData.setName(user.getUsername());
-            userData.setSurname(user.getUserSurname());
-            userData.setEmail(user.getUserEmail());
-            userData.setTel(user.getUserContactNumber());
-            userData.setAddress(user.getUserAddress());
-            userData.setRole(user.getRole().getRoleName());
+                ResponseLoginUserDto.User userData = new ResponseLoginUserDto.User();
+                userData.setName(user.getUserName());
+                userData.setSurname(user.getUserSurname());
+                userData.setEmail(user.getUserEmail());
+                userData.setTel(user.getUserContactNumber());
+                userData.setAddress(user.getUserAddress());
+                userData.setRole(user.getRole().getRoleName());
 
-            ResponseLoginUserDto.Token tokenData = new ResponseLoginUserDto.Token();
-            tokenData.setAccessToken(jwt);
-            tokenData.setRefreshToken(refreshToken);
+                ResponseLoginUserDto.Token tokenData = new ResponseLoginUserDto.Token();
+                tokenData.setAccessToken(jwt);
+                tokenData.setRefreshToken(refreshToken);
 
-            responseLoginUser.setUser(userData);
-            responseLoginUser.setToken(tokenData);
-            response.setErrorCode(0);
+                responseLoginUser.setUser(userData);
+                responseLoginUser.setToken(tokenData);
+                response.setErrorCode(0);
+            } else {
+                response.setErrorCode(401); // Неверный пароль
+            }
             return response;
         }
-        catch (AuthenticationException e) {
+        catch (UsernameNotFoundException e) {
             response.setErrorCode(401);
             return response;
         }
@@ -137,7 +130,7 @@ public class UsersLogisticsService {
             }
 
             ResponseLoginUserDto.User userData = new ResponseLoginUserDto.User();
-            userData.setName(user.getUsername());
+            userData.setName(user.getUserName());
             userData.setSurname(user.getUserSurname());
             userData.setEmail(user.getUserEmail());
             userData.setTel(user.getUserContactNumber());
