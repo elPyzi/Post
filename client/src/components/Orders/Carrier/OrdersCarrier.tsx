@@ -1,25 +1,23 @@
-import Cookies from 'js-cookie';
+import styles from '../Order.module.css';
 
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
 import { API_CONFIG } from '../../../config/api.config';
-import { useAuthCheck } from '../../../hooks/useAuthCheck';
-
-type TOrder = {
-  id: number;
-  name: string;
-  locationInfo: {
-    from: string;
-    goingTo: string;
-  };
-};
+import { useAuthenticatedFetch } from '../../../hooks/useAuthenticatedFetch';
+import { TOrder } from '../../../types/Order';
 
 export const OrdersCarrier = () => {
-  const { checkAuth } = useAuthCheck();
+  const { authenticationFetch } = useAuthenticatedFetch();
   const navigate = useNavigate();
   const [route, setRoute] = useState<string[]>([]);
+
+  const getOrders = async () => {
+    return authenticationFetch<TOrder[]>(
+      `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DELIVERY.GET_ORDERS}`,
+    );
+  };
 
   const {
     data: orders,
@@ -28,56 +26,16 @@ export const OrdersCarrier = () => {
     refetch,
   } = useQuery<TOrder[]>({
     queryKey: ['orders'],
-    queryFn: async () => {
-      const response = await fetch('http://localhost:4242/api/carrier/orders', {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          Authorization: `Bearer ${Cookies.get('accessToken')}`,
-          Accept: 'application/json',
-        },
-      });
-      return await response.json();
-    },
+    queryFn: getOrders,
   });
 
-  const deleteOrder = async (id: number) => {
-    const accessToken = Cookies.get('accessToken');
-
-    if (!accessToken) {
-      await checkAuth();
-      if (!Cookies.get('accessToken')) {
-        navigate('/login');
-        throw new Error('unAuth');
-      }
-      return deleteOrder(id);
-    }
-
-    try {
-      const response = await fetch(
-        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CLIENT.DELETE_ORDER}/${id}`,
-        {
-          method: 'PUT',
-          credentials: 'include',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        },
-      );
-
-      if (response.status === 401) {
-        await checkAuth();
-        if (!Cookies.get('accessToken')) {
-          navigate('/login');
-          throw new Error('unAuth');
-        }
-        return deleteOrder(id);
-      }
-
-      if (!response.ok) throw new Error('error fetch');
-    } catch (error) {
-      throw new Error(`${error}`);
-    }
+  const deleteOrder = async ({ orderId }: { orderId: number }) => {
+    return authenticationFetch(
+      `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CLIENT.DELETE_ORDER}/${orderId}`,
+      {
+        method: 'PUT',
+      },
+    );
   };
 
   const { mutate: orderMutation } = useMutation({
@@ -85,55 +43,30 @@ export const OrdersCarrier = () => {
     onSuccess: () => refetch(),
   });
 
-  const handleAddOrderToRoute = ({ city }: { city: string }) => {
+  const handleOrderRoute = ({ city }: { city: string }) => {
     setRoute((prev) => {
-      const route = [...prev, city];
-      return route;
+      return prev.includes(city)
+        ? prev.filter((c) => c !== city)
+        : [...prev, city];
     });
   };
 
   const startDelivery = async () => {
-    const accessToken = Cookies.get('accessToken');
-
-    if (!accessToken) {
-      await checkAuth();
-      if (!Cookies.get('accessToken')) {
-        navigate('/login');
-        throw new Error('unAuth');
-      }
-      return startDelivery();
-    }
-
-    try {
-      const response = await fetch(
-        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DELIVERY.START_DELIVERY}`,
-        {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({ route }),
+    return authenticationFetch(
+      `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DELIVERY.START_DELIVERY}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      );
-
-      if (response.status === 401) {
-        await checkAuth();
-        if (!Cookies.get('accessToken')) {
-          navigate('/login');
-          throw new Error('unAuth');
-        }
-        return startDelivery();
-      }
-
-      if (!response.ok) throw new Error('error fetch');
-    } catch (error) {
-      throw new Error(`${error}`);
-    }
+        body: JSON.stringify({ route }),
+      },
+    );
   };
 
   const { mutate: deliveryMutation } = useMutation({
     mutationFn: startDelivery,
+    onSuccess: () => {},
   });
 
   if (isError) {
@@ -141,42 +74,53 @@ export const OrdersCarrier = () => {
   }
 
   return (
-    <>
-      <table>
-        <thead>
+    <div className={styles.container}>
+      <table className={styles.table}>
+        <thead className={styles.tableHead}>
           <tr>
-            <td>Заказ</td>
-            <td>От куда доставить</td>
-            <td>Куда доставить</td>
-            <td></td>
+            <td className={styles.tableCell}>Имя заказа</td>
+            <td className={styles.tableCell}>От куда</td>
+            <td className={styles.tableCell}>Куда</td>
+            <td className={styles.tableCell}></td>
           </tr>
         </thead>
         <tbody>
           {orders?.map((order) => (
-            <tr key={order.id}>
-              <td>{order.name}</td>
-              <td>{order.locationInfo.from}</td>
-              <td>{order.locationInfo.goingTo}</td>
-              <td>
-                <button
-                  type="button"
-                  onClick={() =>
-                    handleAddOrderToRoute({ city: order.locationInfo.goingTo })
-                  }
-                >
-                  {route.includes(order.name) ? 'Убрать' : 'Добавить'}
-                </button>
-                <button type="button" onClick={() => orderMutation(order.id)}>
-                  Удалить
-                </button>
+            <tr key={order.id} className={styles.tableRow}>
+              <td className={styles.tableCell}>{order.name}</td>
+              <td className={styles.tableCell}>{order.locationInfo.from}</td>
+              <td className={styles.tableCell}>{order.locationInfo.goingTo}</td>
+              <td className={styles.tableCell}>
+                <div className={styles.actionButtons}>
+                  <button
+                    className={styles.button}
+                    type="button"
+                    onClick={() =>
+                      handleOrderRoute({ city: order.locationInfo.goingTo })
+                    }
+                  >
+                    {route.includes(order.name) ? 'Убрать' : 'Добавить'}
+                  </button>
+                  <button
+                    className={styles.button}
+                    type="button"
+                    onClick={() => orderMutation({ orderId: order.id })}
+                  >
+                    Удалить
+                  </button>
+                </div>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      <button type="button" onClick={() => deliveryMutation()}>
+      <button
+        type="button"
+        onClick={() => deliveryMutation()}
+        className={styles.startDelivery}
+      >
         Начать доставку
       </button>
-    </>
+    </div>
   );
 };

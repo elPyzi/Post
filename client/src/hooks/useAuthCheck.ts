@@ -1,24 +1,25 @@
 import Cookies from 'js-cookie';
 
-import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRefreshToken } from './useRefreshToken';
 import { useAppDispatch } from './reduxHooks';
 
 import { API_CONFIG } from '../config/api.config';
 import { login } from '../store/slices/AuthSlice';
-import { PushMessages } from '../utils/PushMesseges';
+
+import { ErrorMessage } from '../utils/PushMessages/Error/ErrorMessages';
 
 export const useAuthCheck = () => {
-  const [isChecking, setChecking] = useState(true);
-  const pushMessages = new PushMessages();
+  const pushMessages = useMemo(() => new ErrorMessage(), []);
+  const [isChecking, setIsChecking] = useState(true);
 
   const dispatch = useAppDispatch();
   const { refreshToken } = useRefreshToken();
-  const COOKIE_ENABLE =
-    localStorage.getItem('cookieEnable') === 'accept' ? true : false;
+  const COOKIE_ENABLE = localStorage.getItem('cookieEnable') === 'accept';
 
   const checkAuth = async () => {
+    if (!COOKIE_ENABLE) return null;
+
     try {
       const accessToken = Cookies.get('accessToken');
 
@@ -36,22 +37,20 @@ export const useAuthCheck = () => {
         );
 
         if (!response.ok) {
-          setChecking(false);
+          setIsChecking(false);
           return null;
         }
 
         if (response.status == 403) {
-          pushMessages.showErrorMessage('Вы заблокированы', {
-            body: 'Введите себя лучше',
-          });
-          setChecking(false);
+          pushMessages.HTTP403();
+          setIsChecking(false);
           return null;
         }
 
         const data = await response.json();
         const { user } = data;
         dispatch(login(user));
-        setChecking(false);
+        setIsChecking(false);
         return null;
       }
 
@@ -64,20 +63,9 @@ export const useAuthCheck = () => {
     } catch (error) {
       throw new Error(`${error}`);
     } finally {
-      setChecking(false);
+      setIsChecking(false);
     }
   };
-
-  useQuery({
-    queryKey: ['checkAuth'],
-    queryFn: () => {
-      if (COOKIE_ENABLE) return checkAuth();
-      return null;
-    },
-    retry: false,
-    refetchOnWindowFocus: false,
-    enabled: false,
-  });
 
   return { checkAuth, isChecking };
 };

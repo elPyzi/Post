@@ -8,8 +8,10 @@ import { Errorpage } from './pages/Errorpage';
 import { Profile } from './components/Profile/Profile';
 import { Orders } from './components/Orders/Orders';
 import { UserInteraction } from './components/UserInteraction/UserInteraction';
+import { Deliverypage } from './pages/Deliverypage';
 
 import { ProtectedAuth } from './utils/ProtectedRoutes/ProtectedAuth';
+import { Routes } from './components/Routes/Routes';
 
 export const routes: RouteObject[] = [
   {
@@ -20,6 +22,10 @@ export const routes: RouteObject[] = [
       {
         index: true,
         element: <Homepage />,
+      },
+      {
+        path: 'delivery/:type',
+        element: <Deliverypage />,
       },
       {
         path: 'account',
@@ -40,6 +46,10 @@ export const routes: RouteObject[] = [
           {
             path: 'user-interaction',
             element: <UserInteraction />,
+          },
+          {
+            path: 'routes',
+            element: <Routes />,
           },
         ],
       },

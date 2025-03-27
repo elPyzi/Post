@@ -1,11 +1,14 @@
 import Cookies from 'js-cookie';
-import { API_CONFIG } from '../config/api.config';
-import { PushMessages } from '../utils/PushMesseges';
+
+import { useMemo } from 'react';
 import { useAppDispatch } from './reduxHooks';
+
+import { API_CONFIG } from '../config/api.config';
 import { logout } from '../store/slices/AuthSlice';
+import { ErrorMessage } from '../utils/PushMessages/Error/ErrorMessages';
 
 export const useRefreshToken = () => {
-  const pushMess = new PushMessages();
+  const pushMessages = useMemo(() => new ErrorMessage(), []);
   const dispatch = useAppDispatch();
 
   const refreshToken = async (): Promise<boolean> => {
@@ -29,9 +32,7 @@ export const useRefreshToken = () => {
       return true;
     }
 
-    pushMess.showErrorMessage('Сессия истекла', {
-      body: 'авторизуйтесь снова',
-    });
+    pushMessages.HTTP401();
     dispatch(logout());
     return false;
   };

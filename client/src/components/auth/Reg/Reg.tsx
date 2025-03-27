@@ -5,7 +5,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import { API_CONFIG } from '../../../config/api.config';
-import { PushMessages } from '../../../utils/PushMesseges';
+import { PushMessages } from '../../../utils/PushMessages/PushMessages';
 
 type TReg = {
   name: string;

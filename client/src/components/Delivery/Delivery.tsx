@@ -1,83 +1,40 @@
+/**
+ * * Компонент для вывода типов доставки
+ * * DeliveryCard это компонент который выводит информацию о типе доставке
+ */
+
 import styles from './Delivery.module.css';
 
-import { useMemo } from 'react';
+import { useAuthenticatedFetch } from '../../hooks/useAuthenticatedFetch';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
 import { DeliveryCard } from '../DeliveryCard/DeliveryCard';
 import { API_CONFIG } from '../../config/api.config';
 
-import { useAuthCheck } from '../../hooks/useAuthCheck';
-
-import Cookies from 'js-cookie';
-import { PushMessages } from '../../utils/PushMesseges';
-
-type DeliveryData = {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  img: string;
-}[];
-
-// ! ПРОВЕРИТЬ ЕСЛИ REFRESH И ACCESS НЕ БУДЕТ И ПОСМОТРЕТЬ ЗАПРОС
+import { DeliveryData } from '../../types/DeliveryData';
 
 export const Delivery = () => {
-  const pushMessages = useMemo(() => new PushMessages(), []);
   const navigate = useNavigate();
-  const { checkAuth } = useAuthCheck();
+  const { authenticationFetch } = useAuthenticatedFetch();
 
-  const fetchDeliveryTypes = async (): Promise<DeliveryData> => {
-    const accessToken = Cookies.get('accessToken');
-
-    if (!accessToken) {
-      await checkAuth();
-
-      if (!Cookies.get('accessToken')) {
-        navigate('/login');
-        pushMessages.showErrorMessage('Сессия истекла', {
-          body: 'Авторизуйтесь снова',
-        });
-        throw new Error('Unauthorized');
-      }
-
-      return fetchDeliveryTypes();
-    }
-
-    const response = await fetch(
+  const fetchDeliveryTypes = async () => {
+    return authenticationFetch<DeliveryData[]>(
       `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DELIVERY.DELIVERY_TYPES}`,
-      {
-        credentials: 'include',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          Accept: 'application/json',
-        },
-      },
     );
-
-    if (response.status === 401) {
-      await checkAuth();
-
-      if (!Cookies.get('accessToken')) {
-        navigate('/login');
-        pushMessages.showErrorMessage('Сессия истекла', {
-          body: 'Авторизуйтесь снова',
-        });
-        throw new Error('Unauthorized');
-      }
-      return fetchDeliveryTypes();
-    }
-
-    return response.json();
   };
 
-  const { data, isError, isLoading } = useQuery<DeliveryData>({
+  const {
+    data: deliveryTypes,
+    isError,
+    isLoading,
+  } = useQuery<DeliveryData[]>({
     queryKey: ['delivery'],
     queryFn: fetchDeliveryTypes,
   });
 
   if (isLoading) return <div>Загрузка</div>;
 
-  if (isError || !data || data.length === 0) {
+  if (isError || !deliveryTypes || deliveryTypes.length === 0) {
     navigate(`/error/${404}`);
     return null;
   }
@@ -87,14 +44,9 @@ export const Delivery = () => {
       <div className={styles.delivery}>
         <h3 className={styles.title}>Наши доставки</h3>
         <div className={styles.deliveryTypes}>
-          {data.map((deliveryType) => (
-            <Link
-              to={deliveryType.name.replace(/\s+/g, '-')}
-              key={deliveryType.id}
-            >
+          {deliveryTypes.map((deliveryType) => (
+            <Link to={`delivery/${deliveryType}`} key={deliveryType.id}>
               <DeliveryCard
-                key={deliveryType.id}
-                id={deliveryType.id}
                 Img={deliveryType.img}
                 deliveryName={deliveryType.name}
                 price={deliveryType.price}

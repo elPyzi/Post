@@ -1,24 +1,24 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-type TCity = {
+type TCities = {
   id: number;
   name: string;
 }[];
 
 type TCitiesState = {
-  city: TCity | null;
+  cities: TCities | null;
 };
 
 const initialState: TCitiesState = {
-  city: null,
+  cities: null,
 };
 
 const citiesSlice = createSlice({
   name: 'cities',
   initialState,
   reducers: {
-    setCities: (state, action: PayloadAction<TCity>) => {
-      state.city = action.payload;
+    setCities: (state, action: PayloadAction<TCities>) => {
+      state.cities = action.payload;
     },
   },
 });

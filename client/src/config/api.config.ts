@@ -14,7 +14,6 @@ export const API_CONFIG = {
     CLIENT: {
       UPDATE: '/api/client/update',
       MAKE_ORDER: '/api/client/make-order',
-      GET_ORDERS: '/api/client/get-orders',
       DELETE_ORDER: '/api/client/delete-order',
     },
     ADMIN: {
@@ -25,6 +24,11 @@ export const API_CONFIG = {
       DELIVERY_TYPES: '/api/delivery/delivery-types',
       GET_CARRIERS: '/api/delivery/get-carriers',
       START_DELIVERY: '/api/delivery/start',
+      GET_ORDERS: '/api/delivery/get-orders',
+    },
+    CARRIER: {
+      GET_ROUTES: '/api/carrier/get-routes',
+      DELETE_ROUTE: 'api/carrier/delete-route',
     },
   },
 };

@@ -1,5 +1,6 @@
 import '../../../assets/styles/auth.css';
 
+import { useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -8,7 +9,9 @@ import { useAppDispatch } from '../../../hooks/reduxHooks';
 import { User } from '../../../types/User';
 import { login } from '../../../store/slices/AuthSlice'; // Add this import
 import { API_CONFIG } from '../../../config/api.config';
-import { PushMessages } from '../../../utils/PushMesseges';
+
+import { CheckMessage } from '../../../utils/PushMessages/Check/CheckMessages';
+import { ErrorMessage } from '../../../utils/PushMessages/Error/ErrorMessages';
 
 /**
  * * LoginType это типы которые принимает функция(типизация функции)
@@ -36,7 +39,9 @@ type TRespone = {
 };
 
 export const Login = () => {
-  const pushMessages = new PushMessages();
+  const pushCheckMessages = useMemo(() => new CheckMessage(), []);
+  const pushErrorMessages = useMemo(() => new ErrorMessage(), []);
+
   const [email, setEmail] = useState<string>('');
   const [pass, setPass] = useState<string>('');
   const dispatch = useAppDispatch();
@@ -63,16 +68,12 @@ export const Login = () => {
     onSuccess: (data) => {
       const { user } = data;
       dispatch(login(user));
-      pushMessages.showCheckMessage('Авторизация успешна', {
-        body: 'Хорошего дня',
-      });
+      pushCheckMessages.AuthSuccess();
       setTimeout(() => navigate('/'), 1000);
     },
     onError: (error) => {
       if (error.message === '403') {
-        pushMessages.showErrorMessage('Вы заблокированы', {
-          body: 'Введите себя лучше',
-        });
+        pushErrorMessages.HTTP403();
         return;
       }
       navigate(`/error/${error.message}`);
