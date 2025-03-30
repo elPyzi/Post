@@ -11,6 +11,8 @@ import Cookies from 'js-cookie';
 import { useRefreshToken } from '../../hooks/useRefreshToken';
 import { useAppSelector } from '../../hooks/reduxHooks';
 
+import { useAuthenticatedFetch } from '../../hooks/useAuthenticatedFetch';
+
 export type TUserInteraction = Pick<
   User,
   'name' | 'surname' | 'email' | 'role'
@@ -26,6 +28,7 @@ const getTotalPageCount = (usersTotal: number): number =>
   Math.ceil(usersTotal / ROWS_PER_PAGE);
 
 export const UserInteraction = () => {
+  const { authenticationFetch } = useAuthenticatedFetch();
   const { user } = useAppSelector((state) => state.auth);
   const { refreshToken } = useRefreshToken();
   const currentUserId = user?.id;
@@ -49,19 +52,12 @@ export const UserInteraction = () => {
 
   const userInteraction = useMutation({
     mutationFn: async ({ qId, action }: { qId: number; action: string }) => {
-      const response = await fetch(
+      authenticationFetch(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ADMIN.API_ADMIN}${action}/${qId}`,
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${Cookies.get('accessToken')}`,
-          },
-          body: JSON.stringify({ qId }),
         },
       );
-      if (response.status === 401) refreshToken();
-      if (!response.ok) throw new Error(`${response.status}`);
     },
     onSuccess: () => {
       refetch();

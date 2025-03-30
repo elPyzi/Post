@@ -31,7 +31,7 @@ export const OrdersClient = () => {
   // * Удалить заказ
   const deleteOrder = async ({ orderId }: { orderId: number }) => {
     return authenticationFetch(
-      `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CLIENT.DELETE_ORDER}/${orderId}`,
+      `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DELIVERY.DELETE_ORDER}/${orderId}`,
       {
         method: 'PUT',
       },
@@ -75,7 +75,11 @@ export const OrdersClient = () => {
               <td className={styles.tableCell}>{order.status.description}</td>
               <td className={styles.tableCell}>
                 <div className={styles.actionButtons}>
-                  <button className={styles.button} type="button" onClick={() => handleDeleteOrder(order.id)}>
+                  <button
+                    className={styles.button}
+                    type="button"
+                    onClick={() => handleDeleteOrder(order.id)}
+                  >
                     Удалить заказ
                   </button>
                 </div>

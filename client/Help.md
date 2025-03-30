@@ -1,6 +1,11 @@
 # Client
 
-### Folders
+## Info
+
+1. [Components](Documentaion/components.md)
+2. [Custom hooks](Documentaion/hooks.md)
+
+## Folders
 
 1. `src` all product code here
 2. `assets` styles of pages, css variables(colors), reset css, images and fonts

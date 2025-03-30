@@ -31,7 +31,7 @@ export const OrdersCarrier = () => {
 
   const deleteOrder = async ({ orderId }: { orderId: number }) => {
     return authenticationFetch(
-      `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CLIENT.DELETE_ORDER}/${orderId}`,
+      `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DELIVERY.DELETE_ORDER}/${orderId}`,
       {
         method: 'PUT',
       },

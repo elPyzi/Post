@@ -12,23 +12,23 @@ export const API_CONFIG = {
       REFRESH: '/api/auth/refresh',
     },
     CLIENT: {
-      UPDATE: '/api/client/update',
-      MAKE_ORDER: '/api/client/make-order',
-      DELETE_ORDER: '/api/client/delete-order',
+      UPDATE: '/client/update',
+      MAKE_ORDER: '/client/make-order',
     },
     ADMIN: {
-      API_ADMIN: '/api/admin/',
-      GET_USERS: 'api/admin/getUsers',
+      API_ADMIN: '/admin/',
+      GET_USERS: '/admin/getUsers',
     },
     DELIVERY: {
       DELIVERY_TYPES: '/api/delivery/delivery-types',
       GET_CARRIERS: '/api/delivery/get-carriers',
       START_DELIVERY: '/api/delivery/start',
       GET_ORDERS: '/api/delivery/get-orders',
+      DELETE_ORDER: '/api/delivery/delete-order',
     },
     CARRIER: {
-      GET_ROUTES: '/api/carrier/get-routes',
-      DELETE_ROUTE: 'api/carrier/delete-route',
+      GET_ROUTES: '/carrier/get-routes',
+      DELETE_ROUTE: '/carrier/delete-route',
     },
   },
 };
