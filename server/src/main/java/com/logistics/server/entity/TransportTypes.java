@@ -23,12 +23,5 @@ public class TransportTypes {
     private double price;
 
     @Column(name = "image")
-    private byte[] image;
-
-    public String getImageAsBase64() {
-        if (image != null) {
-            return Base64.getEncoder().encodeToString(image);
-        }
-        return null;
-    }
+    private String image;
 }

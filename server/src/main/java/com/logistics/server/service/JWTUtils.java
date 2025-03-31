@@ -10,8 +10,6 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Objects;
 import java.util.function.Function;
 
 @Component
@@ -28,26 +26,38 @@ public class JWTUtils {
     }
 
     public String generateToken(Users userDetails) {
+        System.out.println(userDetails.getRole().getRoleName());
         return Jwts.builder().
                 subject(userDetails.getUserEmail())
+                .claim("role", userDetails.getRole().getRoleName())
+                .claim("token", "accessToken")
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + ACCESS_TIME))
                 .signWith(Key)
                 .compact();
     }
 
-    public String generateRefreshToken(HashMap<String, Objects> claims, Users userDetails){
+    public String generateRefreshToken(Users userDetails){
         return Jwts.builder()
-                .claims(claims)
                 .subject(userDetails.getUserEmail())
+                .claim("role", userDetails.getRole().getRoleName())
+                .claim("token", "refreshToken")
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + REFRESH_TIME))
                 .signWith(Key)
                 .compact();
     }
 
-    public  String extractUsername(String token){
+    public String extractUsername(String token){
         return extractClaims(token, Claims::getSubject);
+    }
+
+    public String extractRole(String token) {
+        return extractClaims(token, claims -> claims.get("role", String.class));
+    }
+
+    public String extractTokenType(String token) {
+        return extractClaims(token, claims -> claims.get("token", String.class));
     }
 
     private <T> T extractClaims(String token, Function<Claims, T> claimsTFunction){

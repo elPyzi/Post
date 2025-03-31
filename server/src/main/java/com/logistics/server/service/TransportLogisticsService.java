@@ -13,22 +13,4 @@ import java.util.stream.Collectors;
 public class TransportLogisticsService {
     @Autowired
     private TransportTypesRepo transportTypesRepo;
-
-    public List<ResponceTransportDto> getAllTransportTypes() {
-        List<TransportTypes> transportTypes = transportTypesRepo.findAll();
-        return transportTypes.stream().map(transport -> {
-            ResponceTransportDto dto = new ResponceTransportDto();
-            dto.setId(transport.getTransportTypeId());
-            dto.setName(transport.getTypeName());
-            dto.setDescription(transport.getDescription());
-            dto.setPrice(transport.getPrice());
-            String base64Image = transport.getImageAsBase64();
-            if (base64Image != null) {
-                dto.setImg("data:image/jpeg;base64," + base64Image);
-            } else {
-                dto.setImg(null);
-            }
-            return dto;
-        }).collect(Collectors.toList());
-    }
 }

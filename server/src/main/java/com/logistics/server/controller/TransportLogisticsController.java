@@ -14,10 +14,4 @@ import java.util.List;
 public class TransportLogisticsController {
     @Autowired
     TransportLogisticsService transportLogisticsService;
-
-    @GetMapping("/api/delivery/delivery-types")
-    public ResponseEntity<List<ResponceTransportDto>> getTransport(HttpServletRequest request) {
-        List<ResponceTransportDto> transportTypes = transportLogisticsService.getAllTransportTypes();
-        return ResponseEntity.ok(transportTypes);
-    }
 }
