@@ -13,7 +13,7 @@ public class Delivery {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "delivery_id")
-    private Long deliveryId;
+    private int deliveryId;
 
     @Column(name = "delivery_name", nullable = false)
     private String deliveryName;

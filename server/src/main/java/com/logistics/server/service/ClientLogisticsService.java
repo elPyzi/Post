@@ -94,13 +94,6 @@ public class ClientLogisticsService {
         routes.setCitiesOrder(new Integer[0]);
         routesRepo.save(routes);
 
-        Delivery delivery = new Delivery();
-        delivery.setDeliveryName("Заказ № " + user.getUserId());
-        delivery.setRoute(routes);
-        delivery.setCourier(courirer);
-        delivery.setStatus(orderStatus);
-        deliveryRepo.save(delivery);
-
         Orders orders = new Orders();
         Cities citiesFrom = new Cities();
         Cities citiesTo = new Cities();
@@ -112,6 +105,13 @@ public class ClientLogisticsService {
         orders.setClient(user);
         orders.setStatus(orderStatus);
         ordersRepo.save(orders);
+
+        Delivery delivery = new Delivery();
+        delivery.setDeliveryName("Заказ № " + orders.getId());
+        delivery.setRoute(routes);
+        delivery.setCourier(courirer);
+        delivery.setStatus(orderStatus);
+        deliveryRepo.save(delivery);
         return new ResponceErrorServerDto(200);
     }
 }
