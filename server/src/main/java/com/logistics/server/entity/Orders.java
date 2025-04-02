@@ -30,4 +30,8 @@ public class Orders {
     @ManyToOne
     @JoinColumn(name = "fk_status_id", referencedColumnName = "status_id")
     private OrderStatus status;
+
+    @ManyToOne
+    @JoinColumn(name = "fk_currier", referencedColumnName = "user_id")
+    private Users currier;
 }

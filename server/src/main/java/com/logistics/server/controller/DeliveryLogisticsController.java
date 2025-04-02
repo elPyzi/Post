@@ -1,7 +1,7 @@
 package com.logistics.server.controller;
 
-import com.logistics.server.dto.OrdersDto;
 import com.logistics.server.dto.RequestRouteDto;
+import com.logistics.server.dto.ResponceDeliveryDto;
 import com.logistics.server.dto.ResponceErrorServerDto;
 import com.logistics.server.dto.ResponceOrdersDto;
 import com.logistics.server.service.DeliveryLogisticsService;
@@ -28,19 +28,24 @@ public class DeliveryLogisticsController {
 
     @GetMapping("/get-orders")
     public ResponseEntity<?> getOrders(Principal principal){
-        ResponceErrorServerDto errorResponse = new ResponceErrorServerDto();
         Authentication authentication = (Authentication) principal;
         String role = authentication.getAuthorities().iterator().next().getAuthority();
         String email = authentication.getName();
         ResponceOrdersDto ordersDto = new ResponceOrdersDto();
-        if (role.equals("CARRIER")){
-            errorResponse = deliveryLogisticsService.getOrdersCarrier(ordersDto, email);
-            return ResponseEntity.status(HttpStatus.valueOf(errorResponse.getErrorCode())).body(ordersDto.getOrders());
-        }
-        else if (role.equals("CLIENT")) {
-            errorResponse = deliveryLogisticsService.getOrdersClient(ordersDto, email);
-            return ResponseEntity.status(HttpStatus.valueOf(errorResponse.getErrorCode())).body(ordersDto.getOrders());
-        }
+        ResponceErrorServerDto errorResponse = deliveryLogisticsService.getOrders(ordersDto, email, role);
+        return ResponseEntity.status(HttpStatus.valueOf(errorResponse.getErrorCode())).body(ordersDto.getOrders());
+    }
+
+    @PutMapping("/delete-order/{orderId}")
+    public ResponseEntity<?> deleteOrder(@PathVariable int orderId){
+        ResponceErrorServerDto errorResponse = deliveryLogisticsService.deleteOrder(orderId);
         return ResponseEntity.status(HttpStatus.valueOf(errorResponse.getErrorCode())).body(errorResponse);
+    }
+
+    @GetMapping("/delivery-types")
+    public ResponseEntity<?> getDeliveryTypes(){
+        ResponceDeliveryDto responceDeliveryDto = new ResponceDeliveryDto();
+        ResponceErrorServerDto errorResponse = deliveryLogisticsService.getDeliveryTypes(responceDeliveryDto);
+        return ResponseEntity.status(HttpStatus.valueOf(errorResponse.getErrorCode())).body(responceDeliveryDto.getDelivery());
     }
 }

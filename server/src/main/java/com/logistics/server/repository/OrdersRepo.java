@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface OrdersRepo extends JpaRepository<Orders, Integer> {
     List<Orders> findByClientUserId(int userId);
+    List<Orders> findByCurrierUserId(int userId);
 }

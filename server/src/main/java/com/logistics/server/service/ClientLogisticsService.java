@@ -77,22 +77,11 @@ public class ClientLogisticsService {
         OrderStatus orderStatus = orderStatusRepo.findById(1)
                 .orElseThrow(() -> new RuntimeException("Статус заказа с ID не найден"));
 
-        int transportTypeId = supplierRepo.findTransportTypeIdByUserId(requestOrderDto.getCarrierId())
-                .orElseThrow(() -> new RuntimeException("Тип транспорта не найденa"));
-
         int cityFromId = citiesRepo.findIdByCityName(requestOrderDto.getCityFrom())
                 .orElseThrow(() -> new RuntimeException("Город отправления не найден"));
 
         int goingToCityId = citiesRepo.findIdByCityName(requestOrderDto.getGoingToCity())
                 .orElseThrow(() -> new RuntimeException("Город назначения не найден"));
-
-        Routes routes = new Routes();
-        TransportTypes transportTypes = new TransportTypes();
-        transportTypes.setTransportTypeId(transportTypeId);
-        routes.setRouteName("Маршрут № " + requestOrderDto.getCarrierId());
-        routes.setTransportType(transportTypes);
-        routes.setCitiesOrder(new Integer[0]);
-        routesRepo.save(routes);
 
         Orders orders = new Orders();
         Cities citiesFrom = new Cities();
@@ -104,14 +93,9 @@ public class ClientLogisticsService {
         orders.setCityGoingTo(citiesTo);
         orders.setClient(user);
         orders.setStatus(orderStatus);
+        orders.setCurrier(courirer);
         ordersRepo.save(orders);
 
-        Delivery delivery = new Delivery();
-        delivery.setDeliveryName("Заказ № " + orders.getId());
-        delivery.setRoute(routes);
-        delivery.setCourier(courirer);
-        delivery.setStatus(orderStatus);
-        deliveryRepo.save(delivery);
         return new ResponceErrorServerDto(200);
     }
 }

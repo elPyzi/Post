@@ -26,8 +26,8 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/admin/**").hasAnyAuthority("ADMIN")
-                        .requestMatchers("/client/**").hasAnyAuthority("CLIENT")
-                        .requestMatchers("/carrier/**").hasAnyAuthority("CARRIER")
+                        .requestMatchers("/client/**").hasAnyAuthority("CLIENT", "ADMIN")
+                        .requestMatchers("/carrier/**").hasAnyAuthority("CARRIER", "ADMIN")
                         .requestMatchers("/api/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
