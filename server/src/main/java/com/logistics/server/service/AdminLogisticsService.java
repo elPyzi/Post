@@ -10,10 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class AdminLogisticsService {
@@ -54,9 +51,9 @@ public class AdminLogisticsService {
         return new ResponceErrorServerDto(200);
     }
 
-    public Map<String, ResponceAdminUserDto> getUsersList() {
+    public List<ResponceAdminUserDto> getUsersList() {
         List<Users> users = usersRepo.findAll();
-        Map<String, ResponceAdminUserDto> response = new LinkedHashMap<>();
+        List<ResponceAdminUserDto> response = new ArrayList<>();
 
         for (int i = 0; i < users.size(); i++) {
             Users user = users.get(i);
@@ -74,7 +71,7 @@ public class AdminLogisticsService {
             else {
                 dto.setAdmin(false);
             }
-            response.put(String.valueOf(i), dto);
+            response.add(dto);
         }
         return response;
     }

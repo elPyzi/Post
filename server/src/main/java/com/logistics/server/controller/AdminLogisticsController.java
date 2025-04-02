@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -37,7 +38,7 @@ public class AdminLogisticsController {
 
     @GetMapping("/getUsers")
     public ResponseEntity<?> getUsers() {
-        Map<String, ResponceAdminUserDto> users = adminLogisticsService.getUsersList();
+        List<ResponceAdminUserDto> users = adminLogisticsService.getUsersList();
         return ResponseEntity.ok(users);
     }
 }
