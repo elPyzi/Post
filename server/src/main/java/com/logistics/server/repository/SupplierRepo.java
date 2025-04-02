@@ -6,9 +6,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface SupplierRepo extends JpaRepository<Supplier, SupplierId> {
     @Query("SELECT s FROM Supplier s WHERE s.user.userId = :userId")
     Optional<Supplier> findByUserId(@Param("userId") int userId);
+
+    @Query("SELECT s FROM Supplier s WHERE s.transportType.transportTypeId = :transportTypeId")
+    List<Supplier> findByTransportTypeId(@Param("transportTypeId") int transportTypeId);
 }

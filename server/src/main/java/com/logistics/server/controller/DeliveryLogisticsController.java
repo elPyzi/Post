@@ -1,9 +1,6 @@
 package com.logistics.server.controller;
 
-import com.logistics.server.dto.RequestRouteDto;
-import com.logistics.server.dto.ResponceDeliveryDto;
-import com.logistics.server.dto.ResponceErrorServerDto;
-import com.logistics.server.dto.ResponceOrdersDto;
+import com.logistics.server.dto.*;
 import com.logistics.server.service.DeliveryLogisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -47,5 +44,19 @@ public class DeliveryLogisticsController {
         ResponceDeliveryDto responceDeliveryDto = new ResponceDeliveryDto();
         ResponceErrorServerDto errorResponse = deliveryLogisticsService.getDeliveryTypes(responceDeliveryDto);
         return ResponseEntity.status(HttpStatus.valueOf(errorResponse.getErrorCode())).body(responceDeliveryDto.getDelivery());
+    }
+
+    @GetMapping("/delivery-types/{type}")
+    public ResponseEntity<?> getDeliveryType(@PathVariable String type){
+        DeliveryDto deliveryDto = new DeliveryDto();
+        ResponceErrorServerDto errorServerDto = deliveryLogisticsService.getDeliveryType(deliveryDto, type);
+        return ResponseEntity.status(HttpStatus.valueOf(errorServerDto.getErrorCode())).body(deliveryDto);
+    }
+
+    @GetMapping("/get-carriers/{type}")
+    public ResponseEntity<?> getCarriers(@PathVariable String type){
+        ResponceCarriersDto responceCarriersDto = new ResponceCarriersDto();
+        ResponceErrorServerDto errorServerDto = deliveryLogisticsService.getCarriersTypeTransport(responceCarriersDto, type);
+        return ResponseEntity.status(HttpStatus.valueOf(errorServerDto.getErrorCode())).body(responceCarriersDto.getCarriers());
     }
 }

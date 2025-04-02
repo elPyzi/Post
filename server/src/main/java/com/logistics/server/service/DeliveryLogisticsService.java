@@ -133,4 +133,42 @@ public class DeliveryLogisticsService {
         responceDeliveryDto.setDelivery(deliveryDto);
         return new ResponceErrorServerDto(200);
     }
+
+    public ResponceErrorServerDto getDeliveryType(DeliveryDto deliveryDto, String type){
+        TransportTypes transportTypes = transportTypesRepo.findByTypeName(type)
+                .orElseThrow(() -> new RuntimeException("Тип транспорта не найден"));
+
+        deliveryDto.setId(transportTypes.getTransportTypeId());
+        deliveryDto.setName(transportTypes.getTypeName());
+        deliveryDto.setDescription(transportTypes.getDescription());
+        deliveryDto.setPrice(transportTypes.getPrice());
+        deliveryDto.setImg(transportTypes.getImage());
+
+        return new ResponceErrorServerDto(200);
+    }
+
+    public ResponceErrorServerDto getCarriersTypeTransport(ResponceCarriersDto responceCarriersDto, String type){
+        try {
+            TransportTypes transportTypes = transportTypesRepo.findByTypeName(type)
+                    .orElseThrow(() -> new RuntimeException("Тип транспорта не найден"));
+
+            List<Supplier> suppliers = supplierRepo.findByTransportTypeId(transportTypes.getTransportTypeId());
+            List<CarriersDto> carriersDto = new ArrayList<>();
+
+            for(Supplier supplier : suppliers){
+                Users carrier = usersRepo.findById(supplier.getUser().getUserId())
+                        .orElseThrow(() -> new RuntimeException("Курьер не найден"));
+
+                CarriersDto dto = new CarriersDto();
+                dto.setId(carrier.getUserId());
+                dto.setName(carrier.getUserName());
+                carriersDto.add(dto);
+            }
+            responceCarriersDto.setCarriers(carriersDto);
+            return new ResponceErrorServerDto(200);
+        }
+        catch(Exception e) {
+            return new ResponceErrorServerDto(401);
+        }
+    }
 }
